@@ -13,7 +13,7 @@ This guide is for developers modifying or extending `soroban-budget-assert` itse
 
 ### Windows
 
-For setup on Windows (PowerShell or Git Bash), including prerequisite links, WASM target installation, and PATH troubleshooting, see the authoritative guide in [CONTRIBUTING.md#windows](../https://github.com/Tollcraft/soroban-cost-linter/blob/main/CONTRIBUTING.md#windows).
+For setup on Windows (PowerShell or Git Bash), including prerequisite links, WASM target installation, and PATH troubleshooting, see the authoritative guide in [Windows Setup Guide](../cost-linter/windows_setup.md) or [soroban-cost-linter CONTRIBUTING.md](https://github.com/Tollcraft/soroban-cost-linter/blob/main/CONTRIBUTING.md#windows).
 
 ## Workspace structure
 

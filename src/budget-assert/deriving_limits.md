@@ -39,7 +39,7 @@ write_margin  = 3.00
 ```
 
 All four fields are required. The per-metric split is the minimum
-granularity that fights back against [issue #45](#related-issues): a single
+granularity that fights back against [issue #45](https://github.com/Tollcraft/soroban-budget-assert/issues/45): a single
 global margin is wrong across operation types because the local-vs-network
 gap has different shapes for host-calls vs. VM loops.
 
@@ -91,7 +91,7 @@ Both files begin with `# tier-a-limits.env`, `# tier-a-limits provenance`
 respectively, and are atomically replaced on each write.  The provenance
 file also documents the protocol version, refresh procedure, and how to
 detect staleness — see
-[`tier-a-limits.provenance.md`](../../tier-a-limits.provenance.md).
+[`tier-a-limits.provenance.md`](https://github.com/Tollcraft/soroban-budget-assert/blob/main/tier-a-limits.provenance.md).
 
 ### When to re-derive
 
@@ -101,8 +101,8 @@ following changes, in roughly decreasing order of urgency:
 1. The contract source (any code path that produces a Tier A regression
    in CI is a sign that the Tier B report's underlying profile also moved).
 2. The release profile in the workspace's `Cargo.toml` — see
-   [_Use the same release profile for comparable numbers_](#use-the-same-release-profile-for-comparable-numbers)
-   above; an `opt-level` or `lto` flip silently re-prices every limit.
+   [_Required release profile for comparable measurements_](reference.md#required-release-profile-for-comparable-measurements);
+   an `opt-level` or `lto` flip silently re-prices every limit.
 3. The `soroban-sdk` or `stellar-xdr` version (different host metering,
    different VM cost model; see `measurements.md` for SDK-versioned
    calibration).
@@ -123,7 +123,7 @@ A re-derivation flow into git as the worked audit trail.
 
 A diff in `tier-a-limits.env` is **not** automatically correct. Walk through:
 
-1. Look at [`tier-a-limits.provenance.md`](../../tier-a-limits.provenance.md). Same `tier_b_value`, higher
+1. Look at [`tier-a-limits.provenance.md`](https://github.com/Tollcraft/soroban-budget-assert/blob/main/tier-a-limits.provenance.md). Same `tier_b_value`, higher
    `tier_a_limit`? The Tier A assertion was too loose and you've widened
    it. Tighten the limit by hand only if you understand why Tier B
    hasn't grown the same way; otherwise update the margin in

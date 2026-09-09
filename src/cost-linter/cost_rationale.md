@@ -6,7 +6,7 @@
 
 ## Budgets and Limits
 
-Every Soroban transaction runs against a **per-transaction resource budget**. If execution exhausts the budget, the transaction fails — no partial state is committed. The budget is defined by network-wide limits (set by validator consensus) and reported in two dimensions[^1]:
+Every Soroban transaction runs against a **per-transaction resource budget**. If execution exhausts the budget, the transaction fails — no partial state is committed. The budget is defined by network-wide limits (set by validator consensus) and reported in two dimensions<sup>[[1]](#ref-1)</sup>:
 
 | Resource dimension | Limit type | Charged in fee? |
 |---|---|---|
@@ -18,18 +18,18 @@ Every Soroban transaction runs against a **per-transaction resource budget**. If
 | **Transaction size (bytes)** | Hard cap | Yes |
 
 ::: info
-Current per-transaction limits are published on the [Stellar Lab](https://lab.stellar.org/) under *Resource Limits & Fees*[^2]. These values change only through validator consensus.
+Current per-transaction limits are published on the [Stellar Lab](https://lab.stellar.org/) under *Resource Limits & Fees*<sup>[[2]](#ref-2)</sup>. These values change only through validator consensus.
 :::
 
 ---
 
 ## Metered Resources
 
-Soroban's fee model is **multidimensional**: the resource fee is the sum of charges for several independent resource types[^1].
+Soroban's fee model is **multidimensional**: the resource fee is the sum of charges for several independent resource types<sup>[[1]](#ref-1)</sup>.
 
 ### 1. CPU Instructions
 
-Every Wasm instruction the guest executes and every host function the contract calls is metered as CPU instructions. The host environment tracks more than 85 distinct **cost types** (`ContractCostType`[^3]), each with its own calibrated cost model of the form `y = a + bx`, where `x` is a runtime input size.
+Every Wasm instruction the guest executes and every host function the contract calls is metered as CPU instructions. The host environment tracks more than 85 distinct **cost types** (`ContractCostType`<sup>[[3]](#ref-3)</sup>), each with its own calibrated cost model of the form `y = a + bx`, where `x` is a runtime input size.
 
 Key cost types that matter for linting:
 
@@ -40,7 +40,7 @@ Key cost types that matter for linting:
 | `MemAlloc` / `MemCpy` / `MemCmp` | Memory-management operations |
 | `VisitObject` | Accessing a host object from storage |
 
-**The per-instruction cost is not uniform.** A `ComputeSha256Hash` call costs orders of magnitude more CPU than a `WasmInsnExec` — but every cost type is ultimately summed into the same instruction counter[^3].
+**The per-instruction cost is not uniform.** A `ComputeSha256Hash` call costs orders of magnitude more CPU than a `WasmInsnExec` — but every cost type is ultimately summed into the same instruction counter<sup>[[3]](#ref-3)</sup>.
 
 ### 2. Memory (RAM)
 
@@ -50,7 +50,7 @@ For linting purposes, memory is a secondary concern: storage and CPU dominate th
 
 ### 3. Storage: Ledger Entry Accesses and Ledger I/O
 
-Storage operations are the **single most expensive resource** a typical Soroban contract can consume[^4]. The fee model charges in two sub-dimensions[^1]:
+Storage operations are the **single most expensive resource** a typical Soroban contract can consume<sup>[[4]](#ref-4)</sup>. The fee model charges in two sub-dimensions<sup>[[1]](#ref-1)</sup>:
 
 - **Ledger entry accesses** — each distinct storage key read or written counts as one access, regardless of its size.
 - **Ledger I/O** — the total number of bytes read from or written to the ledger.
@@ -63,7 +63,7 @@ The size of the submitted transaction envelope (in bytes) is charged for network
 
 ### 5. Events and Return Values
 
-Events emitted by the contract and the top-level return value are included in transaction metadata and contribute to the resource fee. These costs are refundable: the network charges the declared maximum up front and refunds the unused portion after execution[^1].
+Events emitted by the contract and the top-level return value are included in transaction metadata and contribute to the resource fee. These costs are refundable: the network charges the declared maximum up front and refunds the unused portion after execution<sup>[[1]](#ref-1)</sup>.
 
 ### 6. Ledger Space Rent
 
@@ -72,7 +72,7 @@ Every ledger entry a contract creates or extends has a Time-To-Live (TTL). Exten
 #### Entry Lifecycle & Durability: Temporary vs. Persistent vs. Instance
 
 How an entry behaves when its TTL hits zero depends entirely on which storage
-type it lives in[^7]:
+type it lives in<sup>[[7]](#ref-7)</sup>:
 
 | Storage type | Behavior on TTL expiry | Cost | Intended for |
 |---|---|---|---|
@@ -112,13 +112,13 @@ For the patterns this linter catches, the resource hierarchy is:
 
 **Storage writes dominate** because they consume four resources simultaneously: a ledger entry access, write I/O bytes, the serialization CPU cost, and (for new entries) space rent. A single storage write in a loop can cost more than the rest of the loop body combined.
 
-**Host function calls** (e.g., `env.ledger().sequence()`) are cheaper than storage but still expensive relative to pure Wasm because they pay the `DispatchHostFunction` overhead plus whatever work the host performs[^3]. Calling a constant-returning host function inside a loop is pure waste.
+**Host function calls** (e.g., `env.ledger().sequence()`) are cheaper than storage but still expensive relative to pure Wasm because they pay the `DispatchHostFunction` overhead plus whatever work the host performs<sup>[[3]](#ref-3)</sup>. Calling a constant-returning host function inside a loop is pure waste.
 
 ---
 
 ## The Local-vs-Network Gap
 
-One of the most surprising results from empirical measurement is how much local estimates can differ from real network costs. Measured on the example contract from the sibling repository `soroban-budget-assert`[^5]:
+One of the most surprising results from empirical measurement is how much local estimates can differ from real network costs. Measured on the example contract from the sibling repository `soroban-budget-assert`<sup>[[5]](#ref-5)</sup>:
 
 | Execution mode | CPU instructions | Gap vs. testnet |
 |---|---|---|
@@ -127,7 +127,7 @@ One of the most surprising results from empirical measurement is how much local 
 | Testnet simulation (`simulateTransaction`) | 756,678 | Ground truth |
 
 ::: warning
-Raw Rust test estimates are **unreliable** for budget decisions — they can miss real network cost by over 80%. Even WASM-mode local estimates can be off by double-digit percentages, and the direction (over vs. under) depends on the build profile.[^5]
+Raw Rust test estimates are **unreliable** for budget decisions — they can miss real network cost by over 80%. Even WASM-mode local estimates can be off by double-digit percentages, and the direction (over vs. under) depends on the build profile.<sup>[[5]](#ref-5)</sup>
 :::
 
 **What this means for linting:** The linter catches *structural* anti-patterns that are expensive regardless of the local/network gap. A storage write in a loop is expensive everywhere. But the *magnitude* of savings from fixing it can only be known by running the compiled WASM against a network simulation — which is the purpose of the sibling project `soroban-budget-assert`.
@@ -153,7 +153,7 @@ Each lint in this repository targets a specific resource dimension. Every lint i
 
 ## What We Don't Yet Know
 
-- **Exact per-instruction CPU costs for every `ContractCostType`** — the calibrated model parameters (`a`, `b` for each cost type) are set by network consensus and are not published in developer-facing documentation. They can be inspected in the `rs-soroban-env` source repository[^6].
+- **Exact per-instruction CPU costs for every `ContractCostType`** — the calibrated model parameters (`a`, `b` for each cost type) are set by network consensus and are not published in developer-facing documentation. They can be inspected in the `rs-soroban-env` source repository<sup>[[6]](#ref-6)</sup>.
 - **Decomposed storage costs** — the ratio of "ledger entry access fee" to "I/O byte fee" is not specified independently. The total storage fee is what matters for linting, but measuring the split requires network simulation.
 
 ::: info
@@ -164,16 +164,10 @@ Local measurements are available in the [`cost_benchmarks`](https://github.com/T
 
 ## References
 
-[^1]: Stellar Development Foundation, *"Understanding Fees, Resource Limits, and Metering"*, Stellar Docs. [https://developers.stellar.org/docs/learn/fundamentals/fees-resource-limits-metering](https://developers.stellar.org/docs/learn/fundamentals/fees-resource-limits-metering)
-
-[^2]: Stellar Lab — *Resource Limits & Fees*. [https://lab.stellar.org/](https://lab.stellar.org/)
-
-[^3]: Stellar XDR Specification, *`ContractCostType` enum* (86 variants). [https://docs.rs/stellar-xdr/latest/stellar_xdr/enum.ContractCostType.html](https://docs.rs/stellar-xdr/latest/stellar_xdr/enum.ContractCostType.html)
-
-[^4]: `soroban-cost-linter` README — *"Storage operations in Soroban are the most expensive resource."* [https://github.com/Tollcraft/soroban-cost-linter](https://github.com/Tollcraft/soroban-cost-linter)
-
-[^5]: `soroban-budget-assert` — *Protocol Mechanics: The measured gap*. [https://github.com/Tollcraft/soroban-budget-assert/blob/main/docs/src/mechanics.md](https://github.com/Tollcraft/soroban-budget-assert/blob/main/docs/src/mechanics.md)
-
-[^6]: Stellar `rs-soroban-env` — host-side cost model definitions. [https://github.com/stellar/rs-soroban-env](https://github.com/stellar/rs-soroban-env)
-
-[^7]: Soroban SDK `Storage` documentation and Stellar *State Archival* guide — storage-type durability semantics (`Temporary` deleted forever, `Persistent`/`Instance` archived and restorable). [https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html](https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html) and [https://developers.stellar.org/docs/learn/fundamentals/contract-development/storage/state-archival](https://developers.stellar.org/docs/learn/fundamentals/contract-development/storage/state-archival)
+* <span id="ref-1">**[1]**</span> Stellar Development Foundation, *"Understanding Fees, Resource Limits, and Metering"*, Stellar Docs. [https://developers.stellar.org/docs/learn/fundamentals/fees-resource-limits-metering](https://developers.stellar.org/docs/learn/fundamentals/fees-resource-limits-metering)
+* <span id="ref-2">**[2]**</span> Stellar Lab — *Resource Limits & Fees*. [https://lab.stellar.org/](https://lab.stellar.org/)
+* <span id="ref-3">**[3]**</span> Stellar XDR Specification, *`ContractCostType` enum* (86 variants). [https://docs.rs/stellar-xdr/latest/stellar_xdr/enum.ContractCostType.html](https://docs.rs/stellar-xdr/latest/stellar_xdr/enum.ContractCostType.html)
+* <span id="ref-4">**[4]**</span> `soroban-cost-linter` README — *"Storage operations in Soroban are the most expensive resource."* [https://github.com/Tollcraft/soroban-cost-linter](https://github.com/Tollcraft/soroban-cost-linter)
+* <span id="ref-5">**[5]**</span> `soroban-budget-assert` — *Protocol Mechanics: The measured gap*. [https://github.com/Tollcraft/soroban-budget-assert/blob/main/docs/src/mechanics.md](https://github.com/Tollcraft/soroban-budget-assert/blob/main/docs/src/mechanics.md)
+* <span id="ref-6">**[6]**</span> Stellar `rs-soroban-env` — host-side cost model definitions. [https://github.com/stellar/rs-soroban-env](https://github.com/stellar/rs-soroban-env)
+* <span id="ref-7">**[7]**</span> Soroban SDK `Storage` documentation and Stellar *State Archival* guide — storage-type durability semantics (`Temporary` deleted forever, `Persistent`/`Instance` archived and restorable). [https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html](https://docs.rs/soroban-sdk/latest/soroban_sdk/storage/struct.Storage.html) and [https://developers.stellar.org/docs/learn/fundamentals/contract-development/storage/state-archival](https://developers.stellar.org/docs/learn/fundamentals/contract-development/storage/state-archival)

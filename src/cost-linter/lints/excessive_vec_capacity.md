@@ -2,7 +2,7 @@
 
 **Default Severity:** `warn`
 
-**Target Resource:** [Memory](../cost_rationale.md#2-memory-ram)
+**Target Resource:** [Memory](../cost_rationale.md#_2-memory-ram)
 
 ## What it does
 

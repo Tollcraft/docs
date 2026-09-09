@@ -20,7 +20,7 @@ collection's current size. The fee climbs quietly over the life of the
 contract and never shows up in a single-call test, because a fresh contract
 starts with an empty (or small) collection and the cost only becomes visible
 once real usage has grown it. See the
-[Cost Rationale — Storage](../cost_rationale.md#3-storage-ledger-entry-accesses-and-ledger-io)
+[Cost Rationale — Storage](../cost_rationale.md#_3-storage-ledger-entry-accesses-and-ledger-i-o)
 for how ledger entry accesses and I/O bytes are charged.
 
 Persistent storage, keyed per entry, is the structurally correct shape for

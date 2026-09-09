@@ -26,7 +26,7 @@ contract invocation that touches that key will pay the archival cost.
 Repeating this pattern across many entries or many ledgers can cause
 unpredictable fee spikes.
 
-See the [Cost Rationale — Entry Lifecycle](../cost_rationale.md#4-entry-lifecycle-ttl-and-archival) for details.
+See the [Cost Rationale — Entry Lifecycle](../cost_rationale.md#entry-lifecycle-durability-temporary-vs-persistent-vs-instance) for details.
 :::
 
 ## Example

@@ -152,7 +152,7 @@ export default defineConfig({
             { text: 'System Architecture', link: '/cost-profiler/reference/architecture' },
             { text: 'Data Models', link: '/cost-profiler/reference/models' },
             { text: 'Known Risks & Failure Modes', link: '/cost-profiler/reference/risks' },
-            { text: 'Spike: Budget API Limitations', link: '/cost-profiler/reference/spike_budget_api' }
+            { text: 'Spike 01: Budget API Limitations', link: '/cost-profiler/reference/spike_budget_api' }
           ]
         },
         {

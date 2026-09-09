@@ -240,7 +240,8 @@ fn test_read_bytes_with_json_config() {
 }
 ```
 
-**Baseline subtraction** — `baseline = &lt;expr&gt; subtracts a fixed floor from the
+<span id="marginal-cost-baseline-subtraction"></span>
+**Baseline subtraction** — `baseline = <expr>` subtracts a fixed floor from the
 measurement before it is compared, so the *marginal* read-bytes cost is what is
 asserted, exactly as for `budget_cpu_lt` / `budget_mem_lt` / `budget_write_bytes_lt`.
 The subtraction saturates at 0.
@@ -405,7 +406,7 @@ the mechanism is thread-safe and needs no `unsafe std::env::set_var`.
 
 The checked-in `tier-a-limits.env` file is the recommended source for
 Tier A limits. Its provenance, refresh procedure, and staleness-detection
-guidance live in [`tier-a-limits.provenance.md`](../../tier-a-limits.provenance.md).
+guidance live in [`tier-a-limits.provenance.md`](https://github.com/Tollcraft/soroban-budget-assert/blob/main/tier-a-limits.provenance.md).
 
 ## Soroban Budget API
 
@@ -449,21 +450,21 @@ This section is the **complete** flag reference: every `#[arg(...)]` field decla
 | Flag | `budget.toml` equivalent | Default | Purpose |
 |---|---|---|---|
 | `cargo-budget-report` | — | — | Top-level CLI entry point. |
-| `--network <NETWORK>` | `network` | none — required from one source | Network to deploy and invoke against, e.g. `testnet` (passed straight through to the `stellar` CLI). CLI flag wins over the file; missing from both is a fatal error naming the field. **Does not** actually change what the simulate step targets — see [the discrepancy note](#--network-does-not-actually-route-the-simulate-step) below. |
+| `--network <NETWORK>` | `network` | none — required from one source | Network to deploy and invoke against, e.g. `testnet` (passed straight through to the `stellar` CLI). CLI flag wins over the file; missing from both is a fatal error naming the field. <span id="mainnet-guard"></span>**Does not** actually change what the simulate step targets — see [the discrepancy note](#network-does-not-actually-route-the-simulate-step) below. |
 | `--source <SOURCE>` | `source` | none — required from one source | Funded Stellar identity used for deploy fees and as the simulation source. Same precedence as `--network`. |
 | `--json` | — | `false` | Emit the report as pretty-printed JSON instead of a table. Composes with `--check` (adds `limit`/`pass` per entry) and with `--record-baseline`/`--check-baseline` (see [Output-format precedence](#output-format-precedence-when-flags-combine)). |
 | `--csv` | — | `false` | Emit the report as CSV instead of a table. Header is `package,function,metric,value` normally, or `package,function,metric,value,limit,pass` under `--check`. Rows whose `value` never simulated are only included in `--check` mode (they carry `pass=false`); in the non-`--check` CSV they are omitted entirely, unlike the JSON/table output, which lists them. Takes priority over `--json`/`--html` if more than one is passed — see [below](#output-format-precedence-when-flags-combine). |
 | `--html` | — | `false` | Emit the report as a single self-contained HTML page — no external CSS, scripts, or fonts, so it renders from a `file://` URL and from a downloaded CI artifact. Rows mirror the JSON output; with `--check` each row also shows its limit and pass/fail status. |
 | `--markdown` | — | `false` | Emit the report as a GitHub-Flavored Markdown table suitable for appending to `$GITHUB_STEP_SUMMARY`. Numeric values are comma-formatted; unavailable metrics (e.g. network-only Read/Write Bytes) render as `N/A (testnet required)`. When used with `--from <PATH>`, reads an existing JSON report file instead of running a live simulation — this is the mode the CI workflow uses to render the step summary from `current_report.json`. |
-| `--check` | — | `false` | Compare measured metrics against `cpu_limit` / `read_limit` / `write_limit` declared per function in `budget.toml`; print a per-function+metric pass/fail line and exit non-zero on any breach or failed configured simulation. See [`--check`: enforcing regression limits](#--check-enforcing-regression-limits-against-network-verified-costs). |
-| `--color <auto\|always\|never>` | — | `auto` | When to colourise the plain-text `--check` report. Only meaningful together with `--check` — there is nothing to colourise otherwise, and callers gate on `args.check` before consulting it. See [the discrepancy note](#-color-does-not-actually-force-colour-into-a-pipe) below: `--color always` does **not**, despite its help text, force colour into a non-terminal output. |
+| `--check` | — | `false` | Compare measured metrics against `cpu_limit` / `read_limit` / `write_limit` declared per function in `budget.toml`; print a per-function+metric pass/fail line and exit non-zero on any breach or failed configured simulation. See [`--check`: enforcing regression limits](#check-enforcing-regression-limits-against-network-verified-costs). |
+| `--color <auto\|always\|never>` | — | `auto` | When to colourise the plain-text `--check` report. Only meaningful together with `--check` — there is nothing to colourise otherwise, and callers gate on `args.check` before consulting it. See [the discrepancy note](#color-does-not-actually-force-colour-into-a-pipe) below: `--color always` does **not**, despite its help text, force colour into a non-terminal output. |
 | `--quiet` | — | `false` | Suppress non-essential progress messages and warnings on stderr (build/deploy/simulate progress, retry notices). The final report is still printed to stdout; fatal errors (spawn failures, hard build failures) still go to stderr regardless. |
 | `--validate` | — | `false` | Re-decode each successful simulation's `SorobanTransactionData` XDR through `stellar xdr decode` and diff the result against the values this tool computed. Any discrepancy is reported as a diagnostic and the process exits non-zero. Silently **skipped** (not failed) when the Stellar CLI or its `xdr decode` subcommand is unavailable — this is a self-check against a second decoder, not a new data source. |
 | `--profile <PROFILE>` | — | `release` | Cargo build profile used to compile each contract's WASM (`cargo build --profile <PROFILE>`). A custom profile (e.g. `release-opt`) must already be defined in the workspace `Cargo.toml`; the tool does not validate that it exists before invoking `cargo build` with it. |
 | `--init` | — | `false` | Scaffold a commented `budget.toml` template at `./budget.toml` and exit immediately — no build, deploy, or simulation happens. Fails if `budget.toml` already exists unless `--force` is also passed. |
 | `--force` | — | `false` | Only meaningful with `--init`: allows overwriting an existing `budget.toml`. Ignored (has no effect on anything) when `--init` is not also passed. |
 | `--record-baseline <PATH>` | — | none | Write a new resource-usage baseline snapshot to `PATH` (conventionally `budget-baseline.toml`) and exit, instead of printing a report. Requires an explicit path argument — `--record-baseline` with no value is a clap parse error, not an implicit default filename. See [Step 6 of the End-User Guide](user_guide.md#step-6-optional-catch-regressions-on-the-workspace-with-a-baseline). |
-| `--check-baseline <PATH>` | — | none | Check current measurements against the baseline snapshot at `PATH`, applying the configured regression tolerance (`--tolerance` / `tolerance` / per-function override). Exits non-zero on any regression beyond tolerance. Mutually exclusive in effect with `--record-baseline` — passing both resolves to whichever `Mode` is checked first in `Mode::from_args` (record wins); do not rely on that ordering, pass only one. |
+| `--check-baseline <PATH>` | — | none | <span id="baseline-comparison-output-check-baseline"></span>Check current measurements against the baseline snapshot at `PATH`, applying the configured regression tolerance (`--tolerance` / `tolerance` / per-function override). Exits non-zero on any regression beyond tolerance. Mutually exclusive in effect with `--record-baseline` — passing both resolves to whichever `Mode` is checked first in `Mode::from_args` (record wins); do not rely on that ordering, pass only one. |
 | `--tolerance <F>` | `tolerance` (top-level) and `[functions.<name>].tolerance` (per-function) | `0.10` | Regression tolerance for `--check-baseline`, as a fraction (`0.10`) or a percentage (`"10%"`). CLI flag overrides the file's top-level `tolerance` — **except** a function's own `[functions.<name>].tolerance`, which outranks even this flag for that function. See [Value precedence](#value-precedence). |
 | `--max-retry-attempts <N>` | `[retry].max_attempts` | `4` | Total attempts (including the first) for deploy, invoke-build, and simulate-RPC calls before giving up. `1` disables retry entirely; `0` is rejected with an error. See [`retry`: transient-failure retry policy](#retry-transient-failure-retry-policy) and the [testnet troubleshooting guide](testnet_troubleshooting.md) for what actually gets retried. |
 | `--retry-backoff-secs <SECS>` | `[retry].initial_backoff_secs` | `2` | Initial backoff before the first retry; doubles on each subsequent attempt (2 → 4 → 8 with the defaults). |
@@ -498,7 +499,7 @@ Every flag in the table above that has a `budget.toml` equivalent column entry f
 report is produced** (in Report, Record, and Check modes). Validation fails
 loudly instead of silently ignoring mistakes — the damaging case being a
 misspelled function name, which previously yielded a report that simply omitted
-the function with no indication anything was wrong (issue #399).
+the function with no indication anything was wrong ([issue #399](https://github.com/Tollcraft/soroban-budget-assert/issues/399)).
 
 Every problem found is reported at once, so a misconfigured file takes one
 round trip to fix rather than five. The error classes are:
@@ -666,6 +667,7 @@ For a function declared in `budget.toml` whose simulation fails, an entry still 
 }
 ```
 
+<span id="configuration-budgettoml"></span>
 ## Configuration: `budget.toml`
 
 The CLI walks upward from the current directory looking for `budget.toml`. When the file is present at the workspace root, running `cargo budget-report` from any subdirectory (e.g. inside a member crate) still finds it. If no `budget.toml` is found in any ancestor directory the CLI falls back to its defaults (network and source must be supplied via flags).
@@ -856,9 +858,9 @@ This is the complete reference for the `budget.toml` file. It was verified again
 | `source` | string | no | none | Stellar source identity used for deployment fees and as simulation source. Falls back to `--source`; if neither is set the run aborts. |
 | `tolerance` | number (fraction) | no | `0.10` | Default regression tolerance for `--check-baseline`. Overridable per function (see below) and by `--tolerance`. |
 | `[margin]` | table | no | none | Per-metric margin multipliers consumed only by `--derive-limits`. See [below](#margin-deriving-tier-a-limits). |
-| `[scenarios.&lt;name&gt;]` | table of tables | no | none | Function-to-scenario mapping consumed only by `--derive-limits`. See [below](#scenariosnamemapping-functions-to-derived-scenario-limits). |
-| `[functions.&lt;name&gt;]` | table of tables | no | none | Per-function configuration. See [below](#functionsnameper-function-configuration). |
-| `[retry]` | table | no | built-in defaults | Retry policy for deploy / invoke-build / simulate RPC calls. See [below](#retrytransient-failure-retry-policy). |
+| `[scenarios.<name>]` | table of tables | no | none | Function-to-scenario mapping consumed only by `--derive-limits`. See [below](#scenarios-name). |
+| `[functions.<name>]` | table of tables | no | none | Per-function configuration. See [below](#functions-name). |
+| `[retry]` | table | no | built-in defaults | Retry policy for deploy / invoke-build / simulate RPC calls. See [below](#retry-transient-failure-retry-policy). |
 
 **Unknown top-level keys and sections are silently accepted.** This is deliberate: `[lints]` (for soroban-cost-linter) and other foreign sections let two tools share one `budget.toml`. Note the asymmetry with `[functions.*]`, where unknown keys are a hard error.
 
@@ -879,13 +881,14 @@ Where a value can come from more than one place, this is the exact order the res
 
 `cargo budget-report` reads **no environment variables** as configuration input. Environment variables appear on the output side only: `--derive-limits` writes `KEY=VALUE` pairs into `tier-a-limits.env` for the Tier A test macros to consume at test time.
 
-### `functions.&lt;name&gt;: per-function configuration
+<span id="functions-name"></span>
+### `functions.<name>`: per-function configuration
 
-The section key &lt;name&gt; must match the **exported WASM function name exactly** (case-sensitive). Names are not package-qualified: if two contracts export the same function name, the single entry applies to both simulations.
+The section key `<name>` must match the **exported WASM function name exactly** (case-sensitive). Names are not package-qualified: if two contracts export the same function name, the single entry applies to both simulations.
 
 | Field | Type | Required | Default | Effect |
 |---|---|---|---|---|
-| `args` | array of strings | no | `[]` | Forwarded verbatim after the `--` separator to `stellar contract invoke -- &lt;fn&gt; &lt;args&gt;. Functions without an entry are simulated with no arguments. |
+| `args` | array of strings | no | `[]` | Forwarded verbatim after the `--` separator to `stellar contract invoke -- <fn> <args>`. Functions without an entry are simulated with no arguments. |
 | `cpu_limit` | integer (u64) | no | none | Inclusive upper bound on the measured `CPU Instructions` metric in `--check` mode. |
 | `read_limit` | integer (u64) | no | none | Inclusive upper bound on `Read Bytes`. |
 | `write_limit` | integer (u64) | no | none | Inclusive upper bound on `Write Bytes`. |
@@ -925,11 +928,12 @@ Consumed only by `cargo budget-report --derive-limits`; ignored by every other m
 
 Each field is individually optional *at parse time*, but the block is usable only when **complete**: if no `--margin-*` flags are given, an incomplete `[margin]` block produces the same `no margin supplied` error as no block at all. All four values must be finite and `>= 1.0`; a sub-1.0 margin would tighten the limit below the measured Tier B value and is rejected. No default is ever picked silently — margins are treated as audit-trail data.
 
-For the current margin values, the Tier A limits they produce, and the protocol version the numbers correspond to, see [`tier-a-limits.provenance.md`](../../tier-a-limits.provenance.md).
+For the current margin values, the Tier A limits they produce, and the protocol version the numbers correspond to, see [`tier-a-limits.provenance.md`](https://github.com/Tollcraft/soroban-budget-assert/blob/main/tier-a-limits.provenance.md).
 
-### `scenarios.&lt;name&gt;: mapping functions to derived scenario limits
+<span id="scenarios-name"></span>
+### `scenarios.<name>`: mapping functions to derived scenario limits
 
-Consumed only by `--derive-limits`. Each scenario sums the Tier B values of its component functions into a single Tier A limit under one environment-variable key. See [`tier-a-limits.provenance.md`](../../tier-a-limits.provenance.md) for the current derived limits and their refresh procedure.
+Consumed only by `--derive-limits`. Each scenario sums the Tier B values of its component functions into a single Tier A limit under one environment-variable key. See [`tier-a-limits.provenance.md`](https://github.com/Tollcraft/soroban-budget-assert/blob/main/tier-a-limits.provenance.md) for the current derived limits and their refresh procedure.
 
 | Field | Type | Required | Default | Effect |
 |---|---|---|---|---|

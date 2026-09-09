@@ -32,7 +32,7 @@ Each redundant hop is a metered host call (and, for `try_from_val`, the
 `Result` unwrap path) that contributes CPU budget with zero behavioural
 benefit. The cost is independent of input, so it is pure, repeatable waste on
 every invocation — see the [Cost Rationale — Metered
-Resources](../cost_rationale.md#1-cpu-instructions) for the cost types involved.
+Resources](../cost_rationale.md#_1-cpu-instructions) for the cost types involved.
 
 ## Example
 

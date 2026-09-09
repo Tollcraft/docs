@@ -17,7 +17,7 @@ directly inside a loop body (`for`, `while`, or `loop`).
 ::: danger
 `extend_ttl` is a metered host call that *also* writes ledger state — it is
 not a read-only query. Extending an entry's TTL incurs a rent payment (see
-[Cost Rationale — Ledger Space Rent](../cost_rationale.md#6-ledger-space-rent)),
+[Cost Rationale — Ledger Space Rent](../cost_rationale.md#_6-ledger-space-rent)),
 priced dynamically based on ledger size. Issuing one `extend_ttl` call per
 iteration — the natural shape when refreshing the TTL of a set of entries —
 multiplies both the host-call dispatch cost and the rent cost by the

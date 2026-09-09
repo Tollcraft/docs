@@ -11,7 +11,7 @@ Flags loops whose iteration count is derived from an untrusted function paramete
 ## Why is this bad?
 
 ::: danger
-Loops that iterate an unbounded number of times based on untrusted input present a denial-of-service vector. An attacker can craft input that forces the loop to run thousands or millions of iterations, each performing a metered storage write, quickly exhausting the contract's resource budget. See the [Cost Rationale — Storage](../cost_rationale.md#3-storage-ledger-entry-accesses-and-ledger-io) for details.
+Loops that iterate an unbounded number of times based on untrusted input present a denial-of-service vector. An attacker can craft input that forces the loop to run thousands or millions of iterations, each performing a metered storage write, quickly exhausting the contract's resource budget. See the [Cost Rationale — Storage](../cost_rationale.md#_3-storage-ledger-entry-accesses-and-ledger-i-o) for details.
 :::
 
 ## Example

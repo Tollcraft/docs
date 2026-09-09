@@ -11,7 +11,7 @@ Detects storage operations (reads or writes) that are executed inside loop bodie
 ## Why is this bad?
 
 ::: danger
-Storage operations are the **single most expensive resource** Soroban charges for. Each storage write consumes a ledger entry write access, I/O bytes, serialization cost, and (for new entries) space rent. Placing them inside a loop multiplies every dimension by the iteration count. See the [Cost Rationale — Storage](../cost_rationale.md#3-storage-ledger-entry-accesses-and-ledger-io) for details.
+Storage operations are the **single most expensive resource** Soroban charges for. Each storage write consumes a ledger entry write access, I/O bytes, serialization cost, and (for new entries) space rent. Placing them inside a loop multiplies every dimension by the iteration count. See the [Cost Rationale — Storage](../cost_rationale.md#_3-storage-ledger-entry-accesses-and-ledger-i-o) for details.
 :::
 
 ## Example

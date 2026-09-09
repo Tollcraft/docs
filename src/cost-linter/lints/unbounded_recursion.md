@@ -124,5 +124,5 @@ classify. When in doubt, the lint does not fire.
 
 ## Known false positives / limitations
 
-See [docs/false_positives.md](../../docs/false_positives.md) for the current list
+See [Handling False Positives](../false_positives.md) for the current list
 of accepted limitations and known false-positive classes.

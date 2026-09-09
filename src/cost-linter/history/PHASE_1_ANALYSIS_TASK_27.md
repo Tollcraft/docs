@@ -1,4 +1,4 @@
-# Phase 1: Reconnaissance Analysis — Issue #197 / Task #27
+# Phase 1: Reconnaissance Analysis — [Issue #197](https://github.com/Tollcraft/soroban-cost-linter/issues/197) / [Task #27](https://github.com/Tollcraft/soroban-cost-linter/issues/27)
 
 > **Note**: This is a historical document from early project planning and does not reflect current architecture or guidance.
 
@@ -6,7 +6,7 @@
 ## Executive Summary
 
 This document captures the Phase 1 reconnaissance for:
-**"docs: add inline comments for complex bitwise operations #27"**
+**"docs: add inline comments for complex bitwise operations [#27](https://github.com/Tollcraft/soroban-cost-linter/issues/27)"**
 
 **⚠️ CRITICAL FINDING**: The CHANGELOG explicitly states that this codebase **contains no bitwise manipulation logic**, and the referenced file (`src/module_27.rs`) does not exist. **This issue is based on an invalid premise.**
 
@@ -34,7 +34,7 @@ From the original issue description:
 
 ## Critical Finding from CHANGELOG
 
-In [CHANGELOG.md](CHANGELOG.md#L22), the unreleased section explicitly documents:
+In [CHANGELOG.md](https://github.com/Tollcraft/soroban-cost-linter/blob/main/CHANGELOG.md#L22), the unreleased section explicitly documents:
 
 ```markdown
 ### Fixed
@@ -45,8 +45,8 @@ In [CHANGELOG.md](CHANGELOG.md#L22), the unreleased section explicitly documents
 ```
 
 **Interpretation:**
-- A grep search was already conducted: `grep -R -nE '&lt;&lt;|&gt;&gt;|&|\||\^|!' src`
-- ✓ Result: **NO bitwise operations found** (&lt;&lt;` left shift, `&gt;&gt; right shift, `&` AND, `|` OR, `^` XOR, `!` NOT)
+- A grep search was already conducted: `grep -R -nE '<<|>>|&|\||\^|!' src`
+- ✓ Result: **NO bitwise operations found** (<< left shift, >> right shift, & AND, | OR, ^ XOR, ! NOT)
 - ✓ The referenced placeholder file (`src/module_17.rs` / `src/module_27.rs`) **does not exist**
 - ✓ Issue #207 was marked **INVALID**
 
@@ -56,16 +56,16 @@ In [CHANGELOG.md](CHANGELOG.md#L22), the unreleased section explicitly documents
 
 ### Files Analyzed
 
-1. **[soroban_cost_lints/src/lib.rs](soroban_cost_lints/src/lib.rs)** — Main linting logic (600+ lines)
+1. **[soroban_cost_lints/src/lib.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/src/lib.rs)** — Main linting logic (600+ lines)
    - ✓ No bitwise operations found
    - Uses logical operators (`&&`, `||`) for control flow
    - Uses `.is()`, `.contains()`, `.matches()` for pattern matching
 
-2. **[cargo-cost-lint/src/main.rs](cargo-cost-lint/src/main.rs)** — CLI tool
+2. **[cargo-cost-lint/src/main.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/cargo-cost-lint/src/main.rs)** — CLI tool
    - ✓ No bitwise operations found
    - Uses `.filter()`, `.map()` for collections
 
-3. **[cargo-cost-lint/src/config.rs](cargo-cost-lint/src/config.rs)** — Configuration handling
+3. **[cargo-cost-lint/src/config.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/cargo-cost-lint/src/config.rs)** — Configuration handling
    - ✓ No bitwise operations found
    - Uses HashMap and TOML parsing
 
@@ -95,7 +95,7 @@ The linter is a **pure AST analysis tool** that:
 - Matches code patterns using the compiler's type system
 - Uses logical operators (`&&`, `||`) for control flow, not bitwise operations
 
-Example from [lib.rs](soroban_cost_lints/src/lib.rs):
+Example from [lib.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/src/lib.rs):
 ```rust
 // Logical operators (not bitwise)
 if let hir::PatKind::Binding(_, hir_id, _, _) = pat.kind {

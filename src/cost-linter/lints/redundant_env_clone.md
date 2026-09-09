@@ -11,7 +11,7 @@ Detects unnecessary `.clone()` calls on the Soroban `Env` object.
 ## Why is this bad?
 
 ::: danger
-The Soroban `Env` object is designed to be highly lightweight and is typically passed by value or reference. Cloning it forces `MemAlloc` and `MemCpy` operations followed by a `VisitObject` of the new handle — all unnecessary CPU cycles that the network charges for. See the [Cost Rationale — Metered Resources](../cost_rationale.md#1-cpu-instructions) for the cost types involved.
+The Soroban `Env` object is designed to be highly lightweight and is typically passed by value or reference. Cloning it forces `MemAlloc` and `MemCpy` operations followed by a `VisitObject` of the new handle — all unnecessary CPU cycles that the network charges for. See the [Cost Rationale — Metered Resources](../cost_rationale.md#_1-cpu-instructions) for the cost types involved.
 :::
 
 ## Cost impact

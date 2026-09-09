@@ -1,4 +1,4 @@
-# Phase 1: Reconnaissance Analysis — Issue #206 / Task #18
+# Phase 1: Reconnaissance Analysis — [Issue #206](https://github.com/Tollcraft/soroban-cost-linter/issues/206) / [Task #18](https://github.com/Tollcraft/soroban-cost-linter/issues/18)
 
 > **Note**: This is a historical document from early project planning and does not reflect current architecture or guidance.
 
@@ -6,7 +6,7 @@
 ## Executive Summary
 
 This document captures the reconnaissance phase analysis for resolving the issue:
-**"test: increase unit test coverage for edge scenarios #18"**
+**"test: increase unit test coverage for edge scenarios [#18](https://github.com/Tollcraft/soroban-cost-linter/issues/18)"**
 
 Currently, the issue description contains template placeholders rather than specific requirements. This analysis documents the repository structure, testing patterns, and clarifications needed to proceed with implementation.
 
@@ -51,16 +51,16 @@ The repository implements 9 distinct lints:
 8. **MAP_INSERT_IN_LOOP** — Map insertions inside loops (StorageOperations)
 9. **BYTES_APPEND_IN_LOOP** — Bytes container growth in loops (Memory)
 
-All lints are registered in: [soroban_cost_lints/src/lib.rs](soroban_cost_lints/src/lib.rs)
+All lints are registered in: [soroban_cost_lints/src/lib.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/src/lib.rs)
 
 ### Test Structure
 
 **Test Framework**: Dylint UI tests (snapshot/expected output tests)
 
-**Main test file**: [soroban_cost_lints/ui/main.rs](soroban_cost_lints/ui/main.rs)
+**Main test file**: [soroban_cost_lints/ui/main.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/ui/main.rs)
 - Contains test case structs and mock Soroban SDK implementations
 - Tests are written as Rust code that should/should not trigger lints
-- Expected lint output is captured in: [soroban_cost_lints/ui/main.stderr](soroban_cost_lints/ui/main.stderr)
+- Expected lint output is captured in: [soroban_cost_lints/ui/main.stderr](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/ui/main.stderr)
 
 **Test execution**:
 ```bash
@@ -73,9 +73,9 @@ cargo clippy --workspace --all-targets -- -D warnings  # Lint checks
 
 Based on repository structure, the following files would need updates:
 
-1. **[soroban_cost_lints/ui/main.rs](soroban_cost_lints/ui/main.rs)** — Add edge case test code
-2. **[soroban_cost_lints/ui/main.stderr](soroban_cost_lints/ui/main.stderr)** — Update expected lint output
-3. **[soroban_cost_lints/src/lib.rs](soroban_cost_lints/src/lib.rs)** — Potentially improve lint logic if needed
+1. **[soroban_cost_lints/ui/main.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/ui/main.rs)** — Add edge case test code
+2. **[soroban_cost_lints/ui/main.stderr](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/ui/main.stderr)** — Update expected lint output
+3. **[soroban_cost_lints/src/lib.rs](https://github.com/Tollcraft/soroban-cost-linter/blob/main/soroban_cost_lints/src/lib.rs)** — Potentially improve lint logic if needed
 
 ---
 

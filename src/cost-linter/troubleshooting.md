@@ -93,9 +93,9 @@ problem.
 - If the inventory is **present**, the toolchain and CLI are fine, so the zero
   findings are almost always a **build / library-load** problem:
   - [cargo-dylint cannot find the lint library](#cargo-dylint-cannot-find-the-lint-library).
-  - [Missing rustc-dev / llvm-tools-preview](#missing-rustc-dev--llvm-tools-preview).
+  - [Missing rustc-dev / llvm-tools-preview](#missing-rustc-dev-llvm-tools-preview).
   - [Toolchain mismatch against the pinned nightly](#toolchain-mismatch-against-the-pinned-nightly).
-  - [cargo-dylint / dylint-link not installed or the wrong version](#cargo-dylint--dylint-link-not-installed-or-the-wrong-version).
+  - [cargo-dylint / dylint-link not installed or the wrong version](#cargo-dylint-dylint-link-not-installed-or-the-wrong-version).
 
 **So the rule is:** a "runs but reports nothing" result is almost never a bug in
 your contract — it is a setup problem that is hiding behind an exit code of `0`.

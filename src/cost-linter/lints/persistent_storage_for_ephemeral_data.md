@@ -23,7 +23,7 @@ never used.
 `Persistent` entries are the most expensive storage type in Soroban. They carry
 rent payments to keep them alive and live under the archiving/restoration
 semantics described in the
-[storage-type durability table](../cost_rationale.md#entry-lifecycle--durability-temporary-vs-persistent-vs-instance).
+[storage-type durability table](../cost_rationale.md#entry-lifecycle-durability-temporary-vs-persistent-vs-instance).
 
 When a value is written and then removed on every path through the same
 function, the write can never outlive the call. Paying `persistent()`'s rent and

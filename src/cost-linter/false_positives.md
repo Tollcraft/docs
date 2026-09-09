@@ -37,7 +37,7 @@ The project runs continuous regression and triage checks against real-world Soro
 | `soroban_inefficient_bytes_concat` | 0 | 2 | warn | True positive: inefficient Bytes concatenation inside a loop |
 | `contract_call_in_loop` | 1 | 0 | warn | Cross-contract batch dispatches |
 | `symbol_new_for_short_literal` | 0 | 10 | warn | True positive: short literals should use `symbol_short!` |
-| `unwrap_on_storage_get` | 0 | 4 | warn | True positive: direct unwrap on storage read |
+| <span id="unwrap_on_storage_get"></span>`unwrap_on_storage_get` | 0 | 4 | warn | True positive: direct unwrap on storage read |
 | `redundant_env_clone` | 0 | 3 | warn | True positive: redundant clones on `Env` handles |
 | `unnecessary_host_function_call` | 0 | 2 | warn | True positive: host functions callable outside loops |
 | `u128_where_u64_suffices` | 0 | 0 | warn | True positive: provably narrow 128-bit arithmetic operations on wasm32 |
@@ -136,7 +136,14 @@ Flags writing collections (e.g. `Vec`, `Map`) to `instance` storage without an e
 
 - **Footprint Risk:** Instance storage is limited to 64KB per contract and shares a single TTL with the contract executable.
 
-### `option_wrapping_in_storage`
+### <span id="instance_storage_write_in_loop"></span>`instance_storage_write_in_loop`
+
+Writing to `instance` storage inside a loop.
+
+- **Footprint & Rent Risk:** Instance storage shares TTL with the contract instance. Writing repeatedly inside a loop multiplies ledger I/O and rent overhead.
+- **Handling:** Hoist writes outside the loop or accumulate values into a single struct/collection before committing to `instance` storage. If intentional, suppress with `#[allow(instance_storage_write_in_loop)]`.
+
+### <span id="option_wrapping_in_storage"></span>`option_wrapping_in_storage`
 
 Fires when the value argument to a storage `.set()` call has type `Option&lt;T&gt;.
 

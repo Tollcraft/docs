@@ -47,7 +47,7 @@ jobs:
 
 The workflow checks out your repository, then invokes the action. The `with:`
 block wires the `config` input to your `budget.toml` (the same file described
-in [Local Configuration](#local-configuration-budgettoml)). If you have more
+in [Local Configuration](#local-configuration-budget-toml)). If you have more
 than one contract workspace in a monorepo, point the action at the right one
 with `working-directory: <path>, and pass any extra CLI flags through `args:`.
 

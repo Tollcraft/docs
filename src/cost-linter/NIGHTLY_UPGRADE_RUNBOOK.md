@@ -137,7 +137,7 @@ This invokes the test suite under the new nightly. Watch for errors related to:
    ```
    The new nightly may have renamed or restructured HIR types.
 
-3. **UI test failures:** If the compiler's error message format changed, expected output won't match. See [Blessing UI Tests](#blessing-ui-tests) below.
+3. **UI test failures:** If the compiler's error message format changed, expected output won't match. See [Blessing UI Tests](#step-9-blessing-ui-tests) below.
 
 ### Step 9: Blessing UI Tests
 
@@ -243,7 +243,7 @@ thread 'ui::tests' panicked at 'assertion failed: ... expected output != actual 
 
 **How to Fix:**
 
-This is expected after a nightly upgrade. Follow the [Blessing UI Tests](#blessing-ui-tests) section above to re-bless the output.
+This is expected after a nightly upgrade. Follow the [Blessing UI Tests](#step-9-blessing-ui-tests) section above to re-bless the output.
 
 ---
 
@@ -271,7 +271,7 @@ This repository ships a scheduled workflow, `.github/workflows/nightly-bump.yml`
 ### What the workflow does
 
 1. **Picks a target.** By default it targets a nightly from ~7 days ago (within the "last 1–2 weeks" window). You can override with the `target_nightly` input.
-2. **Resolves the `clippy_utils` rev** for that date via the GitHub API (see [Step 2](#step-2-find-the-matching-clippy_utils-revision)). Override with the `clippy_rev` input if the auto-resolved rev is wrong.
+2. **Resolves the `clippy_utils` rev** for that date via the GitHub API (see [Step 2](#step-2-find-the-matching-clippy-utils-revision)). Override with the `clippy_rev` input if the auto-resolved rev is wrong.
 3. **Applies the edit** across every file this runbook lists (`rust-toolchain`, `soroban_cost_lints/Cargo.toml`, the two workflows, `action.yml`, `templates/github-action.yml`, `docs/integration.md`, `CONTRIBUTING.md`, `README.md`, `docs/windows_setup.md`) in one go — the same set enforced by `validate-toolchain-pins.sh`.
 4. **Runs the full test suite** (`cargo test --workspace`) under the new nightly.
 5. **Opens or updates a single PR** on the `ci/nightly-bump` branch. It never merges.

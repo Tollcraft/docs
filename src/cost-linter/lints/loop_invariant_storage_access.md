@@ -19,7 +19,7 @@ Storage operations are the **single most expensive resource** Soroban charges fo
 Each storage write consumes a ledger entry write access, I/O bytes, serialization
 cost, and (for new entries) space rent. Repeating a storage operation whose
 operands never change multiplies every dimension by the iteration count for no
-reason. See the [Cost Rationale — Storage](../cost_rationale.md#3-storage-ledger-entry-accesses-and-ledger-io) for details.
+reason. See the [Cost Rationale — Storage](../cost_rationale.md#_3-storage-ledger-entry-accesses-and-ledger-i-o) for details.
 :::
 
 ## Example

@@ -15,7 +15,7 @@ when the call site sits inside a loop body (`for`, `while`, or `loop`).
 ::: danger
 Elliptic-curve signature verification is one of the most CPU-expensive host
 functions a Soroban contract can call — orders of magnitude more expensive
-than a plain `WasmInsnExec` (see [Cost Rationale — CPU Instructions](../cost_rationale.md#1-cpu-instructions)).
+than a plain `WasmInsnExec` (see [Cost Rationale — CPU Instructions](../cost_rationale.md#_1-cpu-instructions)).
 Unlike a host call whose result is constant across iterations
 (see [`unnecessary_host_function_call`](unnecessary_host_function_call.md)),
 this cost cannot be hoisted out of the loop: each iteration is verifying a

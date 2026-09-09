@@ -20,7 +20,7 @@ cost, and (for new entries) space rent. Placing them inside a loop multiplies
 every dimension by the iteration count. Placing them inside **nested** loops
 makes the cost **multiplicative** — a contract that passes testing with small
 inputs can exceed the ledger's resource limits on real data. See the
-[Cost Rationale — Storage](../cost_rationale.md#3-storage-ledger-entry-accesses-and-ledger-io)
+[Cost Rationale — Storage](../cost_rationale.md#_3-storage-ledger-entry-accesses-and-ledger-i-o)
 for details.
 :::
 
