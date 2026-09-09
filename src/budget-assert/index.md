@@ -1,34 +1,74 @@
-# Introduction
+# Budget Assert Overview
 
-`soroban-budget-assert` solves a specific problem in the Stellar ecosystem: local resource estimates do not match real network costs, and the error can point in either direction.
+<span class="tier-pill t2">Tier 2 • Detect</span>
 
-Measured on this repo's example contract (`do_expensive_work(10_000)`, testnet ground truth 756,678 CPU instructions):
+> **Empirical runtime cost enforcement for Soroban smart contracts** — simulate invocations against live network metering inside `cargo test` and gate pull requests against resource regressions.
 
-- Raw Rust test estimates ran **~81% under** the network cost (143,887 locally).
-- WASM-mode estimates depend on the build profile: with Cargo's default release profile they ran ~8% *under* the network cost of that build (767,049 vs 832,006), and with the standard Soroban size-optimization profile they run **~19% over** (901,816 vs 756,678).
+Part of the **Tollcraft** initiative:
+* **Tier 1: Prevent** — [Cost Linter](/cost-linter/): Catch structurally expensive anti-patterns before compilation.
+* **Tier 2: Detect** — [Budget Assert](index.md): Measure network-simulated costs and enforce budgets in CI.
+* **Tier 3: Diagnose** — [Cost Profiler](/cost-profiler/): Trace execution and generate visual flamegraphs down to Rust lines.
 
-::: warning
-A developer who trusts local numbers either deploys a contract that exhausts its budget on the public network, or over-provisions against costs that aren't real. Both mistakes come from the same root cause: the only trustworthy number is a network simulation of the exact WASM you deploy.
+---
+
+## The Divergence Problem
+
+`soroban-budget-assert` solves a critical failure mode in Soroban smart contract engineering: **local resource estimates do not match real network costs**, and the error can point in either direction.
+
+Measured on an example contract (`do_expensive_work(10_000)`):
+
+<div class="divergence-box">
+  <div class="divergence-title">
+    <span>🔬</span> Empirical Resource Divergence vs. Network Truth
+  </div>
+  <div class="divergence-grid">
+    <div class="divergence-item">
+      <div class="divergence-label">RAW RUST TEST</div>
+      <div class="divergence-val under">-81%</div>
+      <div class="divergence-note">143,887 inst. (Dangerously under-estimates CPU!)</div>
+    </div>
+    <div class="divergence-item">
+      <div class="divergence-label">SIZE-OPT WASM</div>
+      <div class="divergence-val over">+19%</div>
+      <div class="divergence-note">901,816 inst. (Over-provisions against phantom costs)</div>
+    </div>
+    <div class="divergence-item">
+      <div class="divergence-label">TESTNET GROUND TRUTH</div>
+      <div class="divergence-val truth">756,678</div>
+      <div class="divergence-note">Exact Protocol 22 Network Simulation</div>
+    </div>
+  </div>
+</div>
+
+::: warning The only trustworthy number is a live network simulation
+A developer who trusts local numbers either deploys a contract that exhausts its budget on the public network, or over-provisions against costs that aren't real. Both mistakes come from the same root cause: mock environments do not execute the exact Stellar Core metering VM.
 :::
 
-This tool provides both halves of the fix: `cargo budget-report` measures network-simulated resource usage across a whole workspace, and the `budget_macros` assertions pin measured costs into `cargo test` so a cost regression fails CI before it fails on-chain. When an assertion fails, Tollcraft's Tier 3 diagnostic tool, [Cost Profiler](/cost-profiler/), traces execution instruction-by-instruction and renders visual flamegraphs to locate the bottleneck.
+---
 
-The exact WASM matters. This project's published figures use the workspace release profile from `Cargo.toml`:
+## The Solution: Two-Tier Verification
 
-```toml
-[profile.release]
-opt-level = "z"
-overflow-checks = true
-debug = 0
-strip = "symbols"
-debug-assertions = false
-panic = "abort"
-codegen-units = 1
-lto = true
+`soroban-budget-assert` gives you the best of both worlds:
+
+1. **Tier A (Local Fast Assertions):** Deterministic test assertions via `#[budget_cpu_lt(N)]` that run in milliseconds in your normal `cargo test` suite.
+2. **Tier B (Network-Verified CI Gating):** `cargo budget-report` deploys the exact compiled WASM to a test network, simulates RPC invocations, and fails CI on any regression beyond a configured tolerance threshold.
+
+```bash
+# Check your workspace against budget limits
+cargo budget-report --check --network testnet
 ```
 
-Those settings make the measured artifact smaller and more production-like: size optimization and LTO change generated instructions, one codegen unit improves whole-program optimization, aborting panics removes unwinding code, stripping symbols and disabling debug info change artifact size, release assertions stay off, and overflow checks keep arithmetic checks explicit. Results from a different release profile are different builds and are not comparable to the cost figures in these docs.
+---
 
-::: info
-Scope: the report covers execution resources — CPU instructions and ledger read/write bytes. Those are inputs to the non-refundable resource fee, not a total transaction fee: rent, refundable fees, transaction size, footprint entry counts, and the inclusion fee are not measured. [Measurement scope](reference.md#measurement-scope) sets out the boundary and points at where to find the rest.
+## Documentation Navigation
+
+::: info Getting Started
+To wire assertions into your test suite, start with the [**End-User Guide**](user_guide.md). To set up automated CI budget gating, see the [**CI/CD Integration Guide**](ci_cd_integration.md).
 :::
+
+* 🚀 [**End-User Guide**](user_guide.md) — Step-by-step walkthrough of macros, baseline snapshots, and commands
+* ⚙️ [**Complete CLI & Config Reference**](reference.md) — All flags, `budget.toml` schema, and environment variables
+* 📐 [**Deriving Limits**](deriving_limits.md) — How to calculate safe Tier A local limits from Tier B network measurements
+* 🤖 [**CI/CD Integration Guide**](ci_cd_integration.md) — GitHub Actions workflow and PR summary generation
+* 🔧 [**Testnet Troubleshooting**](testnet_troubleshooting.md) — Handling RPC timeouts, sequence numbers, and funding
+* 🛠️ [**Developer Guide**](developer_guide.md) — Architecture, internals, and building from source

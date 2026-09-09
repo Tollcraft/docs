@@ -10,8 +10,8 @@ hero:
       text: Explore the Pipeline
       link: "#the-pipeline"
     - theme: alt
-      text: View on GitHub
-      link: "https://github.com/Tollcraft"
+      text: Interactive Playground
+      link: "https://tollcraft.github.io/soroban-cost-profiler/"
 
 features:
   - title: 🛡️ Tier 1 — Prevent
@@ -28,28 +28,22 @@ features:
     linkText: Cost Profiler Docs →
 ---
 
-<div id="the-pipeline" style="margin-top: 60px;"></div>
+<div id="the-pipeline" style="margin-top: 48px;"></div>
+
+<!-- Interactive Pipeline Component -->
+<PipelineInteractive />
+
+---
+
+## Unified Command Interface
+
+Execute each tier through familiar Cargo subcommands with zero disruption to standard Rust workflows.
+
+<TerminalDemo />
+
+---
 
 ## The Three Tiers of Cost Awareness
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│ 1. PREVENT: soroban-cost-linter                                        │
-│ Static analysis in rustc / Dylint — catches bad patterns at build time │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ passes checks
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│ 2. DETECT: soroban-budget-assert                                       │
-│ Runtime simulation in cargo test — asserts against exact network budgets│
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ budget violated!
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│ 3. DIAGNOSE: soroban-cost-profiler                                     │
-│ Instruction tracing & flamegraphs — shows exactly where cost occurred  │
-└────────────────────────────────────────────────────────────────────────┘
-```
 
 <div class="tollcraft-grid">
   <a class="tollcraft-card tier-1" href="/cost-linter/">
@@ -76,9 +70,14 @@ features:
 
 ---
 
+<!-- Interactive Cost Telemetry Matrix -->
+<CostTelemetryMatrix />
+
+---
+
 ## The Cost of Soroban Operations
 
-Soroban charges for every hardware resource your contract consumes:
+Soroban charges for every hardware resource your contract consumes on-chain under Stellar Protocol 22:
 
 | Resource Dimension | Unit of Measurement | Hard Cap (Per Tx) | Fee Impact |
 | :--- | :--- | :--- | :--- |
@@ -88,8 +87,8 @@ Soroban charges for every hardware resource your contract consumes:
 | **Ledger Entry Writes** | Key-value pairs mutated | 25 entries | Non-refundable fee per entry written |
 | **Ledger Read Bytes** | Serialized payload bytes | ~200 KB | Non-refundable fee per KB read |
 | **Ledger Write Bytes** | Serialized payload bytes | ~100 KB | Non-refundable fee per KB written |
-| **Ledger Space Rent** | Byte $\times$ Ledgers duration | Dynamic | Dynamic refundable rent based on entry TTL |
+| **Ledger Space Rent** | Byte &times; Ledgers duration | Dynamic | Dynamic refundable rent based on entry TTL |
 
 ::: tip Every wasted instruction is a fee your users pay
-Cost bugs don't fail standard tests — they silently inflate transaction fees in production. Use the Tollcraft pipeline to audit and safeguard your protocols.
+Cost bugs don't fail standard unit tests — they silently inflate transaction fees in production. Use the Tollcraft pipeline to audit, gate, and diagnose your contracts before deployment.
 :::

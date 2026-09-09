@@ -1,8 +1,14 @@
-# Introduction
+# Cost Profiler Overview
+
+<span class="tier-pill t3">Tier 3 • Diagnose</span>
 
 > **Visual flamegraphs and execution tracing for Soroban smart contracts** — pinpoint the exact functions, loops, and host operations consuming your transaction budget.
 
 Part of the **Tollcraft** initiative.
+
+::: tip Interactive Online Playground Available
+Don't want to install anything locally yet? Try out the [**Interactive Web Playground**](https://tollcraft.github.io/soroban-cost-profiler/) to inspect live sample flamegraphs, zoom into stack frames, and search hot functions right in your browser.
+:::
 
 ---
 
