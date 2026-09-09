@@ -63,7 +63,7 @@
       </div>
 
       <div class="panel-footer">
-        <a :href="currentStage.link" class="action-btn">
+        <a :href="withBase(currentStage.link)" class="action-btn">
           Explore {{ currentStage.name }} Documentation →
         </a>
       </div>
@@ -73,6 +73,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { withBase } from 'vitepress'
 
 interface Stage {
   id: string

@@ -9,14 +9,18 @@ export default defineConfig({
   srcDir: '.',
   cleanUrls: true,
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/favicon.ico', sizes: 'any' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }],
+    ['link', { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }],
+    ['link', { rel: 'apple-touch-icon', href: '/favicon.png' }],
     ['meta', { name: 'theme-color', content: '#07050d' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Tollcraft — Soroban Cost Awareness' }],
-    ['meta', { property: 'og:description', content: 'A three-tier cost pipeline for Stellar smart contracts. Lint at compile time, assert at test time, profile when the budget fails.' }]
+    ['meta', { property: 'og:description', content: 'A three-tier cost pipeline for Stellar smart contracts. Lint at compile time, assert at test time, profile when the budget fails.' }],
+    ['meta', { property: 'og:image', content: '/tollcraft-logo.png' }]
   ],
   themeConfig: {
-    logo: undefined,
+    logo: '/favicon.png',
     siteTitle: 'Tollcraft',
     darkModeSwitchLabel: 'Appearance',
     search: {
