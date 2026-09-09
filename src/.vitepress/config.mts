@@ -5,6 +5,7 @@ export default defineConfig({
   description: 'Soroban Smart Contract Cost Awareness Pipeline',
   base: process.env.BASE_URL || (process.env.CI ? '/docs/' : '/'),
   ignoreDeadLinks: true,
+  appearance: 'force-dark',
   srcDir: '.',
   cleanUrls: true,
   head: [
@@ -17,14 +18,15 @@ export default defineConfig({
   themeConfig: {
     logo: undefined,
     siteTitle: 'Tollcraft',
+    darkModeSwitchLabel: 'Appearance',
     search: {
       provider: 'local'
     },
     nav: [
       { text: 'Home', link: '/' },
-      { text: '🛡️ Cost Linter', link: '/cost-linter/' },
-      { text: '🧪 Budget Assert', link: '/budget-assert/' },
-      { text: '🔥 Cost Profiler', link: '/cost-profiler/' },
+      { text: 'Cost Linter', link: '/cost-linter/' },
+      { text: 'Budget Assert', link: '/budget-assert/' },
+      { text: 'Cost Profiler', link: '/cost-profiler/' },
       {
         text: 'Ecosystem',
         items: [

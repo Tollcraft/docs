@@ -46,10 +46,10 @@ cargo cost-lint --all-targets
 New here? Start with the [**Integration Guide**](integration.md) to wire the linter into your workspace and CI in minutes. Before proposing a new lint, read [**Scope: Clippy vs. soroban-cost-linter**](scope_boundary.md).
 :::
 
-* 🔍 [**Lint Catalog**](lint_catalog.md) — complete catalog of all 40+ lints and category breakdown
-* 🏷️ [**Lint Categories**](lint_categories.md) — grouping by storage, compute, memory, and authorization
-* ⚡ [**Storage In Loop Rule**](lints/soroban_storage_in_loop.md) — deep dive into our flagship prevention lint
-* 🔌 [**Integration Guide**](integration.md) — `budget.toml` configuration and GitHub Actions setup
-* 📏 [**Scope: Clippy vs. soroban-cost-linter**](scope_boundary.md) — which patterns belong here and which belong to Clippy
-* 🧭 [**Troubleshooting**](troubleshooting.md) — library-not-found, toolchain mismatch, and silent failures
-* 📋 [**Cost Rationale**](cost_rationale.md) — empirical research backing every lint severity score
+* [**Lint Catalog**](lint_catalog.md) — complete catalog of all 40+ lints and category breakdown
+* [**Lint Categories**](lint_categories.md) — grouping by storage, compute, memory, and authorization
+* [**Storage In Loop Rule**](lints/soroban_storage_in_loop.md) — deep dive into our flagship prevention lint
+* [**Integration Guide**](integration.md) — `budget.toml` configuration and GitHub Actions setup
+* [**Scope: Clippy vs. soroban-cost-linter**](scope_boundary.md) — which patterns belong here and which belong to Clippy
+* [**Troubleshooting**](troubleshooting.md) — library-not-found, toolchain mismatch, and silent failures
+* [**Cost Rationale**](cost_rationale.md) — empirical research backing every lint severity score

@@ -18,7 +18,7 @@
         </button>
       </div>
       <button class="copy-btn" @click="copyCommand" :title="copied ? 'Copied!' : 'Copy Command'">
-        <span>{{ copied ? '✓ Copied' : '⎘ Copy' }}</span>
+        <span>{{ copied ? 'COPIED' : 'COPY' }}</span>
       </button>
     </div>
 
@@ -59,7 +59,7 @@ const commands: TerminalCommand[] = [
    <span class="c-cyan">|</span>     <span class="c-yellow">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
    <span class="c-cyan">=</span> <span class="c-bold">help</span>: batch storage writes outside the loop iteration
    <span class="c-cyan">=</span> <span class="c-bold">cost impact</span>: ~25,000 CPU instructions + 1 ledger write entry per cycle
-<span class="c-green">✓</span> Finished analysis in 0.42s (1 warning, 0 errors)`
+<span class="c-green">[OK]</span> Finished analysis in 0.42s (1 warning, 0 errors)`
   },
   {
     id: 'assert',
@@ -75,7 +75,7 @@ const commands: TerminalCommand[] = [
   • Memory Bytes     :   <span class="c-green">14,280</span> /    25,000 B      <span class="c-green">[PASS]</span>
   • Read Bytes       :    <span class="c-green">1,024</span> /     2,000 B      <span class="c-green">[PASS]</span>
   • Write Bytes      :      <span class="c-green">512</span> /     1,000 B      <span class="c-green">[PASS]</span>
-<span class="c-green">✓ All 4 budget limits satisfied within 0% tolerance. CI check passed.</span>`
+<span class="c-green">[PASS] All 4 budget limits satisfied within 0% tolerance. CI check passed.</span>`
   },
   {
     id: 'profiler',
@@ -93,7 +93,7 @@ Execution completed in 1,248,310 instructions.
   3. <span class="c-yellow">16.4%</span>  204,720 inst.  amm_math::compute_constant_product (math.rs:32)
   4. <span class="c-dim">13.6%</span>  169,790 inst.  other frame calls
 
-<span class="c-green">✓ Interactive SVG flamegraph exported to ./flamegraph.svg</span>`
+<span class="c-green">[OK] Interactive SVG flamegraph exported to ./flamegraph.svg</span>`
   }
 ]
 

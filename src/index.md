@@ -14,15 +14,15 @@ hero:
       link: "https://tollcraft.github.io/soroban-cost-profiler/"
 
 features:
-  - title: 🛡️ Tier 1 — Prevent
+  - title: Tier 1 — Prevent
     details: Catch structurally expensive anti-patterns (storage in loops, redundant clones) before your code compiles using rustc and Dylint static analysis.
     link: /cost-linter/
     linkText: Cost Linter Docs →
-  - title: 🧪 Tier 2 — Detect
+  - title: Tier 2 — Detect
     details: Simulate your contract against live network metering inside cargo test. Pin verified costs and fail CI before regressions hit on-chain.
     link: /budget-assert/
     linkText: Budget Assert Docs →
-  - title: 🔥 Tier 3 — Diagnose
+  - title: Tier 3 — Diagnose
     details: When a budget fails, trace WASM execution instruction-by-instruction, map offsets back to Rust lines via DWARF, and inspect visual flamegraphs.
     link: /cost-profiler/
     linkText: Cost Profiler Docs →

@@ -82,6 +82,13 @@ h1, h2, h3, .VPHomeHero .name, .VPNavBarTitle {
   border-bottom: 1px solid rgba(244, 241, 255, 0.08) !important;
 }
 
+/* Hide light/dark mode appearance toggle button */
+.VPSwitchAppearance,
+.VPSwitchAppearance + .VPNavBarExtra,
+.VPMenuLink .VPSwitchAppearance {
+  display: none !important;
+}
+
 .VPSidebar {
   background: var(--void-2) !important;
   border-right: 1px solid rgba(244, 241, 255, 0.08) !important;

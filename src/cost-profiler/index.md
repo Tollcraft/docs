@@ -90,11 +90,11 @@ Without execution profiling, developers are forced to manually comment out code 
 Ready to start profiling? Read the [**Overview & Quickstart**](getting-started/quickstart.md) and ensure you configure [**The Debug Precondition**](getting-started/debug_precondition.md) before building your WASM binaries.
 :::
 
-* 🚀 [**Overview & Quickstart**](getting-started/quickstart.md) — Profile your first Soroban contract in minutes
-* ⚠️ [**The Debug Precondition**](getting-started/debug_precondition.md) — How to preserve DWARF symbols without bloating production mainnet contracts
-* 💰 [**Soroban Cost Model & Metering**](cost/cost_model.md) — Detailed breakdown of Soroban cost types, host dispatch, and fee calculations
-* 📊 [**Exclusive vs. Inclusive Costs**](cost/exclusive_vs_inclusive.md) — How to interpret self-cost versus child-call costs
-* 🔥 [**Generating & Reading Flamegraphs**](guides/flamegraphs.md) — How to read and navigate collapsed stacks and flamegraphs
-* 🛠️ [**CLI Tool Reference**](reference/cli.md) — Flags, options, and commands
-* 🗺️ [**Development Roadmap**](contributing/roadmap.md) — Current status and upcoming milestones
+* [**Overview & Quickstart**](getting-started/quickstart.md) — Profile your first Soroban contract in minutes
+* [**The Debug Precondition**](getting-started/debug_precondition.md) — How to preserve DWARF symbols without bloating production mainnet contracts
+* [**Soroban Cost Model & Metering**](cost/cost_model.md) — Detailed breakdown of Soroban cost types, host dispatch, and fee calculations
+* [**Exclusive vs. Inclusive Costs**](cost/exclusive_vs_inclusive.md) — How to interpret self-cost versus child-call costs
+* [**Generating & Reading Flamegraphs**](guides/flamegraphs.md) — How to read and navigate collapsed stacks and flamegraphs
+* [**CLI Tool Reference**](reference/cli.md) — Flags, options, and commands
+* [**Development Roadmap**](contributing/roadmap.md) — Current status and upcoming milestones
 

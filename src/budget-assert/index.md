@@ -19,7 +19,7 @@ Measured on an example contract (`do_expensive_work(10_000)`):
 
 <div class="divergence-box">
   <div class="divergence-title">
-    <span>🔬</span> Empirical Resource Divergence vs. Network Truth
+    Empirical Resource Divergence vs. Network Truth
   </div>
   <div class="divergence-grid">
     <div class="divergence-item">
@@ -66,9 +66,9 @@ cargo budget-report --check --network testnet
 To wire assertions into your test suite, start with the [**End-User Guide**](user_guide.md). To set up automated CI budget gating, see the [**CI/CD Integration Guide**](ci_cd_integration.md).
 :::
 
-* 🚀 [**End-User Guide**](user_guide.md) — Step-by-step walkthrough of macros, baseline snapshots, and commands
-* ⚙️ [**Complete CLI & Config Reference**](reference.md) — All flags, `budget.toml` schema, and environment variables
-* 📐 [**Deriving Limits**](deriving_limits.md) — How to calculate safe Tier A local limits from Tier B network measurements
-* 🤖 [**CI/CD Integration Guide**](ci_cd_integration.md) — GitHub Actions workflow and PR summary generation
-* 🔧 [**Testnet Troubleshooting**](testnet_troubleshooting.md) — Handling RPC timeouts, sequence numbers, and funding
-* 🛠️ [**Developer Guide**](developer_guide.md) — Architecture, internals, and building from source
+* [**End-User Guide**](user_guide.md) — Step-by-step walkthrough of macros, baseline snapshots, and commands
+* [**Complete CLI & Config Reference**](reference.md) — All flags, `budget.toml` schema, and environment variables
+* [**Deriving Limits**](deriving_limits.md) — How to calculate safe Tier A local limits from Tier B network measurements
+* [**CI/CD Integration Guide**](ci_cd_integration.md) — GitHub Actions workflow and PR summary generation
+* [**Testnet Troubleshooting**](testnet_troubleshooting.md) — Handling RPC timeouts, sequence numbers, and funding
+* [**Developer Guide**](developer_guide.md) — Architecture, internals, and building from source

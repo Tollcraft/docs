@@ -132,7 +132,7 @@ const stages: Stage[] = [
 amm_pool::swap [CPU Instructions]
   Measured: 1,420,110 inst. | Limit: 1,500,000 inst. -> PASS
 amm_pool::swap [Write Bytes]
-  Measured:     2,048 bytes | Limit:     1,024 bytes -> FAIL ✖
+  Measured:     2,048 bytes | Limit:     1,024 bytes -> FAIL
 Error: 1 budget check failed. Regression exceeds 10% tolerance.`,
     link: '/budget-assert/'
   },

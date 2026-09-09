@@ -16,7 +16,7 @@
         :class="['op-tab', { active: selectedOpIndex === idx }]"
         @click="selectedOpIndex = idx"
       >
-        <span class="op-tab-icon">{{ op.icon }}</span>
+        <span class="op-tab-index">0{{ idx + 1 }}.</span>
         <span class="op-tab-title">{{ op.title }}</span>
       </button>
     </div>
@@ -79,7 +79,7 @@
       </div>
 
       <div class="protection-callout">
-        <span class="protect-icon">🛡️</span>
+        <span class="protect-badge">GUARD</span>
         <div class="protect-content">
           <strong>Tollcraft Protection:</strong>
           <span>{{ currentOp.tollcraftGuard }}</span>
@@ -94,7 +94,6 @@ import { ref, computed } from 'vue'
 
 interface Operation {
   id: string
-  icon: string
   title: string
   category: string
   tierLabel: string
@@ -116,7 +115,6 @@ interface Operation {
 const operations: Operation[] = [
   {
     id: 'storage-loop',
-    icon: '🔁',
     title: 'Storage Write in Loop',
     category: 'Storage & I/O',
     tierLabel: 'Tier 1 Caught',
@@ -131,20 +129,19 @@ const operations: Operation[] = [
     rent: 'Repeated TTL hits',
     rentDetail: 'Increases state contention on ledger entries',
     badCode: `for item in items.iter() {
-    // ✖ Incurs N writes and N host cross-calls!
+    // [HAZARD] Incurs N writes and N host cross-calls
     env.storage().instance().set(&item.key, &item.val);
 }`,
     goodCode: `let mut batch = env.storage().instance().get(&BATCH_KEY).unwrap_or(...);
 for item in items.iter() {
     batch.push_back(item);
 }
-// ✔ Commit once at loop completion
+// [OPTIMAL] Commit once at loop completion
 env.storage().instance().set(&BATCH_KEY, &batch);`,
     tollcraftGuard: 'Linted at build-time by instance_storage_write_in_loop and asserted in tests via #[budget_write_bytes_lt].'
   },
   {
     id: 'cross-contract',
-    icon: '⚡',
     title: 'Cross-Contract Invocation',
     category: 'Inter-Contract',
     tierLabel: 'Tier 2 & 3 Profiled',
@@ -159,10 +156,10 @@ env.storage().instance().set(&BATCH_KEY, &batch);`,
     rent: 'Entry TTL dependent',
     rentDetail: 'User balance entry TTL extended if configured',
     badCode: `for recipient in recipients.iter() {
-    // ✖ Individual subcall per recipient in loop!
+    // [HAZARD] Individual subcall per recipient in loop
     token_client.transfer(&admin, &recipient, &amount);
 }`,
-    goodCode: `// ✔ Batch into multi-transfer or pre-validate authorization
+    goodCode: `// [OPTIMAL] Batch into multi-transfer or pre-validate authorization
 token_client.batch_transfer(&admin, &recipients, &amount);
 // Profile subcalls to verify host overhead:
 // soroban-cost-profiler --wasm router.wasm --fn batch_transfer`,
@@ -170,7 +167,6 @@ token_client.batch_transfer(&admin, &recipients, &amount);
   },
   {
     id: 'crypto-hashing',
-    icon: '🔐',
     title: 'Crypto Hash Operations',
     category: 'Host Functions',
     tierLabel: 'Tier 3 Hotspot',
@@ -184,12 +180,12 @@ token_client.batch_transfer(&admin, &recipients, &amount);
     ioDetail: 'Pure computation; no ledger state modified',
     rent: 'None',
     rentDetail: 'Transient computation',
-    badCode: `// ✖ Hashing identical invariant data inside inner loop:
+    badCode: `// [HAZARD] Hashing identical invariant data inside inner loop:
 for item in dataset.iter() {
     let hash = env.crypto().sha256(&static_header);
     verify_item(&hash, item);
 }`,
-    goodCode: `// ✔ Pre-compute hash outside loop scope:
+    goodCode: `// [OPTIMAL] Pre-compute hash outside loop scope:
 let hash = env.crypto().sha256(&static_header);
 for item in dataset.iter() {
     verify_item(&hash, item);
@@ -198,7 +194,6 @@ for item in dataset.iter() {
   },
   {
     id: 'unbounded-vec',
-    icon: '📈',
     title: 'Unbounded Vec Appends',
     category: 'Memory & CPU',
     tierLabel: 'Tier 1 & 2 Guarded',
@@ -213,11 +208,11 @@ for item in dataset.iter() {
     rent: 'Proportional to size',
     rentDetail: 'Larger state entries pay higher continuous rent',
     badCode: `let mut list = Vec::new(&env);
-// ✖ Unbounded external loop parameter
+// [HAZARD] Unbounded external loop parameter
 for i in 0..user_count {
     list.push_back(i);
 }`,
-    goodCode: `// ✔ Enforce bounded cap and pre-allocate if possible
+    goodCode: `// [OPTIMAL] Enforce bounded cap and pre-allocate if possible
 assert!(user_count <= MAX_BATCH_SIZE, "batch limit exceeded");
 let mut list = Vec::new(&env);
 for i in 0..user_count {
@@ -502,8 +497,28 @@ const currentOp = computed(() => operations[selectedOpIndex.value])
   margin-top: 16px;
 }
 
-.protect-icon {
-  font-size: 1.1rem;
+.protect-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.15);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.op-tab-index {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--faint);
+}
+
+.op-tab.active .op-tab-index {
+  color: var(--magenta);
 }
 
 .protect-content {
