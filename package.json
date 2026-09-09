@@ -1,0 +1,27 @@
+{
+  "name": "tollcraft-docs",
+  "version": "1.0.0",
+  "description": "Unified documentation site for Tollcraft: Soroban Cost Awareness",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev src",
+    "docs:build": "vitepress build src",
+    "docs:preview": "vitepress preview src"
+  },
+  "keywords": [
+    "soroban",
+    "stellar",
+    "smart-contracts",
+    "profiler",
+    "linter",
+    "budget",
+    "documentation"
+  ],
+  "author": "Tollcraft Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.42"
+  }
+}
