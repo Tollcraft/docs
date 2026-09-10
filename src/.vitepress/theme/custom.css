@@ -76,22 +76,104 @@ h1, h2, h3, .VPHomeHero .name, .VPNavBarTitle {
 
 /* Nav & glassmorphism */
 .VPNav {
-  background: rgba(7, 5, 13, 0.75) !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+}
+
+.VPNavBar {
+  background: rgba(7, 5, 13, 0.85) !important;
   backdrop-filter: blur(14px) !important;
   -webkit-backdrop-filter: blur(14px) !important;
   border-bottom: 1px solid rgba(244, 241, 255, 0.08) !important;
 }
 
+/* Mobile Nav Screen & Responsiveness */
+.VPNavBarHamburger {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+@media (max-width: 959px) {
+  .Layout.home .VPNav,
+  .Layout:has(.VPHome) .VPNav {
+    position: sticky !important;
+    top: 0 !important;
+  }
+
+  .VPNav:has(.screen-open) {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: var(--vp-z-index-nav) !important;
+  }
+}
+
+.VPNavScreen {
+  position: fixed !important;
+  top: calc(var(--vp-nav-height) + var(--vp-layout-top-height, 0px)) !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100vh - var(--vp-nav-height)) !important;
+  height: calc(100dvh - var(--vp-nav-height)) !important;
+  background-color: rgba(7, 5, 13, 0.98) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  z-index: var(--vp-z-index-nav) !important;
+  overflow-y: auto !important;
+  pointer-events: auto !important;
+}
+
+.VPNavScreenMenuLink,
+.VPNavScreenMenuGroup .button {
+  font-family: var(--font-body) !important;
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  color: var(--paper) !important;
+}
+
+.VPNavScreenMenuLink:hover,
+.VPNavScreenMenuGroup .button:hover {
+  color: var(--cyan) !important;
+}
+
+.VPNavScreenMenuGroupSection .text {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  color: var(--faint) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+}
+
 /* Hide light/dark mode appearance toggle button */
 .VPSwitchAppearance,
 .VPSwitchAppearance + .VPNavBarExtra,
-.VPMenuLink .VPSwitchAppearance {
+.VPMenuLink .VPSwitchAppearance,
+.VPNavScreenAppearance {
   display: none !important;
 }
 
 .VPSidebar {
   background: var(--void-2) !important;
   border-right: 1px solid rgba(244, 241, 255, 0.08) !important;
+}
+
+.VPLocalNav {
+  background: rgba(12, 10, 22, 0.85) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid rgba(244, 241, 255, 0.08) !important;
+}
+
+.VPLocalNavOutlineDropdown .items,
+.VPLocalNavOutlineDropdown .header,
+.VPLocalNavOutlineDropdown .outline {
+  background-color: var(--void-2) !important;
 }
 
 /* Custom cards styling */
