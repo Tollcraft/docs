@@ -20,13 +20,20 @@
 | — | Metering Probes (`tests/meter_probe.rs`) | **Complete** ✅ | 3 / 3 |
 | — | Website Polish (landing page audit) | **Complete** ✅ | 7 / 7 |
 | — | Documentation Upkeep (post-MVP) | **Complete** ✅ | 2 / 2 |
+| — | Post-MVP Accuracy & Coverage | **In progress** 🚧 | 0 / 6 |
 
 Counts are checkbox states in `ROADMAP.md` as of 2026-10-08, read from that file on `main`. #220 was the
-last unchecked box the original plan held, so **no box is open**: 111 checked across the six phases and the
-four side tracks (tooling, metering probes, website polish, documentation upkeep), 0 unchecked. One caveat
-about that figure, because the page prints it: the file lists the #163 fallback-documentation entry twice,
-so 111 checked lines describe 110 pieces of work. Nothing depends on the number — it is here so a reader who
-counts gets the same answer twice.
+last unchecked box the original plan held, and **all 111 of its lines are checked** across the six phases and
+the four side tracks (tooling, metering probes, website polish, documentation upkeep). One caveat about that
+figure, because the page prints it: the file lists the #163 fallback-documentation entry twice, so 111 checked
+lines describe 110 pieces of work — [#257](https://github.com/Tollcraft/soroban-cost-profiler/issues/257) is
+open against exactly that duplication, and this paragraph is the second thing it makes stale.
+
+Below the ladder sits a new section, `## Post-MVP Accuracy & Coverage`, holding **six unchecked boxes (0 / 6)**:
+#252-#257, filed on 2026-10-08 as the work opened after the plan closed. The section landed by
+[PR #258](https://github.com/Tollcraft/soroban-cost-profiler/pull/258) *before* any of that work starts, one
+line per issue, so six concurrent contributors tick their own line instead of appending to the same paragraph
+of the same file.
 
 ---
 
@@ -74,14 +81,24 @@ is two things to keep in sync, which is the failure the section exists to preven
 
 ## Open work
 
-**Nothing in the plan.** Every box in `ROADMAP.md` is checked as of 2026-10-08, and issue #220 — the facade
-split described above — was the last open issue in the repository. Work now starts from a new issue, not
-from this page.
+**Six boxes, six open issues.** Every box of the original plan is checked as of 2026-10-08, and issue #220 —
+the facade split described above — was the last open issue in the repository at the moment it merged. The open
+work is `ROADMAP.md`'s Post-MVP section now: [the instruction limit must halt a runaway contract
+(#252)](https://github.com/Tollcraft/soroban-cost-profiler/issues/252), [wasm segments costed by real fuel
+deltas (#253)](https://github.com/Tollcraft/soroban-cost-profiler/issues/253), [CI must run the real-contract
+cases (#254)](https://github.com/Tollcraft/soroban-cost-profiler/issues/254), [state documents must describe
+the shipped tool (#255)](https://github.com/Tollcraft/soroban-cost-profiler/issues/255), [warning-free rustdoc
+gated in CI (#256)](https://github.com/Tollcraft/soroban-cost-profiler/issues/256) and [tree hygiene
+(#257)](https://github.com/Tollcraft/soroban-cost-profiler/issues/257). Each issue names the exact region of
+the tree it edits — `ci.yml` has one owner, the README's Limitations subsections are split by heading — so
+none of the six waits on another.
 
 Two things the roadmap deliberately does **not** claim to have solved:
 
-* **Instruction-level tracing is an upstream gap.** See the findings below: `wasmi` 2.0 exposes no
-  instruction hook, and no box in this repository owns that.
+* **Instruction-level tracing is an upstream gap.** `wasmi` 2.0 exposes no instruction hook, so a program
+  counter per event and per-instruction counts stay out of reach. It is not the gap it was taken to be,
+  though: the halting half of that limitation runs on the engine's fuel and needs no hook, and the costing
+  half has a readable seam at the host bindings. See the findings below, and #252 and #253.
 * **The generated quality bank is not a to-do list.** Several of its targets have nothing to optimize, which
   `ROADMAP.md` records as blocked or not applicable rather than closing them with a cosmetic diff — see
   [Issues triaged rather than implemented](#issues-triaged-rather-than-implemented).
@@ -98,12 +115,21 @@ they are the reason the [Known Risks & Failure Modes](../reference/risks.md) pag
   call tree can only be as deep as the boundaries the engine reports.
   Pinned by `only_the_outer_invocation_is_recorded_as_a_boundary`.
 * **The instruction ceiling counts boundaries, not instructions.** Its only caller in the live path is the
-  call hook, so a contract looping inside one function body emits no boundaries and is not stopped.
+  call hook, so a contract looping inside one function body emits no boundaries and is not stopped. This is
+  the one claim on the page known to be *incomplete*: `setup_engine` already turns fuel metering on
+  (`src/tracer.rs:239`), `wasmi` 2.0 charges fuel per opcode and traps with `TrapCode::OutOfFuel`, and the
+  suite already proves an out-of-fuel run keeps its partial trace (`tests/meter_probe.rs`). So a finite
+  budget halts that loop with no instruction hook — the budget the live path hands over is `u64::MAX`, and
+  [#252](https://github.com/Tollcraft/soroban-cost-profiler/issues/252) is open against that one number.
 * **A trapped run keeps its trace.** The boundaries crossed before the trap are still there to write, which
   is what Phase 5's panic handling was built on.
 
-The single change that would lift all three is an instruction-level hook in the engine. `wasmi` 2.0 does
-not expose one, and no open issue in this repository owns that gap — it is upstream.
+The single change that would lift all three is an instruction-level hook in the engine, and `wasmi` 2.0 does
+not expose one. But the ceiling finding above shows the halt never needed one: what the engine does expose —
+`Store::{get,set}_fuel` and `Caller::get_fuel` — is enough to stop a runaway loop and to cost the wasm between
+two host calls, which is what #252 and
+[#253](https://github.com/Tollcraft/soroban-cost-profiler/issues/253) take. A per-instruction *program
+counter* stays upstream, and with it the call tree's depth.
 
 ---
 
