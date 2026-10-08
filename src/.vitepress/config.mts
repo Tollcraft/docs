@@ -139,8 +139,8 @@ export default defineConfig({
           text: 'Guides & Tutorials',
           items: [
             { text: 'Diagnosing Regressions', link: '/cost-profiler/guides/diagnosing_regressions' },
-            { text: 'Reading Flamegraphs', link: '/cost-profiler/guides/flamegraphs' },
-            { text: 'Speedscope Visualization', link: '/cost-profiler/guides/speedscope' },
+            { text: 'Reading & Visualizing Profiles', link: '/cost-profiler/guides/flamegraphs' },
+            { text: 'Visualizing with Speedscope', link: '/cost-profiler/guides/speedscope' },
             { text: 'Cross-Contract Calls', link: '/cost-profiler/guides/cross_contract' },
             { text: 'Debugging Panics & Traps', link: '/cost-profiler/guides/panics_and_traps' }
           ]

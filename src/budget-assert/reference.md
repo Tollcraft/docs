@@ -768,7 +768,9 @@ fields out of the `SorobanTransactionData` returned by `simulateTransaction` —
 `resources.instructions`, `resources.disk_read_bytes`, and `resources.write_bytes` — plus the
 compiled WASM binary size from the build step, and prints
 them unchanged. On Soroban Protocol 22+ it additionally reads `result.cost.memBytes` from the JSON-RPC `cost` block and surfaces it as a `Memory Bytes` row. Nothing in the output is denominated in stroops, and no figure it prints is a
-total.### In scope
+total.
+
+### In scope
 
 | Reported | Stellar resource it corresponds to |
 |---|---|
@@ -829,16 +831,19 @@ answering "how much will my users pay".
 
 ## ⚙️ Supported Versions & Compatibility
 
-* **Supported SDK Version**: `soroban-sdk` = `"22.0.11"` (specifically tested/resolved to `22.0.11` in `Cargo.lock`)
-* **Supported XDR Version**: `stellar-xdr` = `"22.1.0"` (used for decoding transaction simulation responses)
-* **Corresponding Stellar Protocol**: **Protocol 22**
+* **Supported SDK Version**: `soroban-sdk` = `"27.0.3"` (resolved to `27.0.6` in `Cargo.lock`) — the pin the
+  simulated contracts use (`amm-pool-contract/Cargo.toml`, `host-function-contract/Cargo.toml`)
+* **Supported XDR Version**: `stellar-xdr` = `"27.0.0"` (`cargo-budget-report/Cargo.toml`; used for decoding
+  transaction simulation responses)
+* **Corresponding Stellar Protocol**: **Protocol 27**
 
 ### Compatibility Matrix
 
 | SDK Version | Protocol Version | Status | Notes |
 | `< 22.0.0` | `< 22` | **Untested** | Older protocols may use different transaction/resource schemas. |
-| `22.0.x` | `22` | **Supported** | Matches pinned manifest dependencies (`soroban-sdk` `22.0.11`, `stellar-xdr` `22.1.0`). |
-| `>= 23.0.0` | `>= 23` | **Untested** | Future protocol upgrades or XDR schema changes (e.g. key/field renames) may break parsing. |
+| `22.0.x` | `22` | **Legacy** | `bloat-contract` still declares `soroban-sdk = "22.0.11"`, so the workspace resolves both 22.0.11 and 27.0.6. Expect the XDR renames listed below. |
+| `27.0.x` | `27` | **Supported** | Matches the pinned manifest dependencies (`soroban-sdk` `27.0.3`, `stellar-xdr` `27.0.0`). |
+| `>= 28.0.0` | `>= 28` | **Untested** | Future protocol upgrades or XDR schema changes (e.g. key/field renames) may break parsing. Note that Tier 3's profiler builds against `soroban-env-host` 28.0.2, i.e. Protocol 28 — the two tiers do not read the same cost tables. |
 
 ## `budget.toml` schema reference
 

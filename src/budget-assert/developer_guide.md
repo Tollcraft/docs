@@ -59,17 +59,29 @@ cargo run -p cargo-budget-report -- budget-report
 
 - **New assertion metrics** — follow the pattern in `budget-macros/src/lib.rs`: build the metric's `assert!` with its accessor on `env.cost_estimate().budget()`, then hand the function and that assertion to `instrument_exit_paths()` so the check reaches every exit path. Keep the failure message explicit. Add a passing test and a `#[should_panic]` regression test in `amm-pool-contract`, plus a `tests/ui/pass/` UI case.
 - **CLI changes** — no panics; return `anyhow::Result` with `.context()` on every external call (network, `stellar` invocations, file I/O). Any new output must also work under `--json`.
-- **Docs** — this site is GitBook, synced from the repository via Git Sync (`.gitbook.yaml` points at `docs/src`). Edits merged to `main` publish automatically; no CI step is involved. Add pages to `docs/src/SUMMARY.md` (GitBook's table of contents). GitBook-specific blocks (``, ``) are available in any page.
+- **Docs** — the published Tollcraft documentation is the VitePress site in
+  [`Tollcraft/docs`](https://github.com/Tollcraft/docs), where this page is
+  `src/budget-assert/developer_guide.md`. Add a page by creating the file and listing it under the
+  `/budget-assert/` sidebar in `src/.vitepress/config.mts`; a page the sidebar does not name is built but
+  unreachable from the menu. A push to `main` triggers the Pages workflow that builds and deploys it to
+  `https://tollcraft.github.io/docs/`. The repository's own `docs/src/` tree is the GitBook-era copy that
+  the unified site replaced, and there is no `.gitbook.yaml` or `SUMMARY.md` in this site.
 
 ## Docs site appearance
 
-The site's look and feel is configured by a space admin in the GitBook app (**space → Customize**), not in this repository. The intended configuration:
+The look and feel is code in that repository, not a hosted space's settings:
 
-- **Theme**: dark mode as the default, with the light/dark toggle enabled.
-- **Accent color**: a single vibrant, high-contrast accent (used for links, hint borders, and active nav) against GitBook's deep dark background.
-- **Code blocks**: syntax highlighting works from the fence language tags already present in these pages (`rust`, `bash`, `toml`, `json`); enable line numbers for long snippets if desired.
+- **Theme**: `appearance: 'force-dark'` in `src/.vitepress/config.mts`. Dark is the design; there is no
+  light/dark toggle.
+- **Accent colours**: `--violet` `#8b5cf6` for brand, with one hue per tier — `--t1` cyan for the linter,
+  `--t2` magenta for the assert tool, `--t3` amber for the profiler — defined in
+  `src/.vitepress/theme/custom.css`.
+- **Containers**: VitePress's `tip`, `warning`, `danger` and `info`. GitBook's `success` and its
+  file-title blocks did not migrate; use `tip` and a sentence above the fence instead.
+- **Code blocks**: syntax highlighting comes from the fence language tags already present in these pages
+  (`rust`, `bash`, `toml`, `json`).
 
-Content and structure changes belong in this repo; theme changes belong in the GitBook UI.
+Content and structure changes belong in `Tollcraft/docs`; so does every theme change.
 
 ## Troubleshooting
 

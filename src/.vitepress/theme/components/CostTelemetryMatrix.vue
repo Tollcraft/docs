@@ -138,13 +138,13 @@ for item in items.iter() {
 }
 // [OPTIMAL] Commit once at loop completion
 env.storage().instance().set(&BATCH_KEY, &batch);`,
-    tollcraftGuard: 'Linted at build-time by instance_storage_write_in_loop and asserted in tests via #[budget_write_bytes_lt].'
+    tollcraftGuard: 'Linted at build-time by soroban_storage_in_loop (the driver\'s Deny-level lint) and asserted in tests via #[budget_write_bytes_lt].'
   },
   {
     id: 'cross-contract',
     title: 'Cross-Contract Invocation',
     category: 'Inter-Contract',
-    tierLabel: 'Tier 2 & 3 Profiled',
+    tierLabel: 'Tier 1 & 2 Guarded',
     tierClass: 't2',
     description: 'Invoking other contracts (e.g. SEP-41 token transfer) requires host context switching, WASM validation, and parameter marshaling.',
     cpu: '150k - 500k+',
@@ -159,11 +159,14 @@ env.storage().instance().set(&BATCH_KEY, &batch);`,
     // [HAZARD] Individual subcall per recipient in loop
     token_client.transfer(&admin, &recipient, &amount);
 }`,
-    goodCode: `// [OPTIMAL] Batch into multi-transfer or pre-validate authorization
-token_client.batch_transfer(&admin, &recipients, &amount);
-// Profile subcalls to verify host overhead:
-// soroban-cost-profiler --wasm router.wasm --fn batch_transfer`,
-    tollcraftGuard: 'Contract call inside loop detected by contract_call_in_loop lint; subcall frame traced by soroban-cost-profiler.'
+    goodCode: `// [OPTIMAL] One host transition instead of N: let the *caller* hold the
+// list and make the transfer call once, outside this contract\'s loop —
+// or expose a batch entry point on the token side and call that.
+for (recipient, amount) in payouts.iter() {
+    ledger.record(recipient, amount);   // cheap: memory only
+}
+// the settlement call happens after the loop, in one transition`,
+    tollcraftGuard: 'contract_call_in_loop flags the per-iteration subcall at build time. The profiler cannot trace into the callee — cross-contract calls are the one case Tier 3 does not cover.'
   },
   {
     id: 'crypto-hashing',
@@ -190,7 +193,7 @@ let hash = env.crypto().sha256(&static_header);
 for item in dataset.iter() {
     verify_item(&hash, item);
 }`,
-    tollcraftGuard: 'crypto_hash_of_constant lint flags build-time invariants; flamegraph highlights exclusive CPU time in host::crypto.'
+    tollcraftGuard: 'crypto_hash_of_constant flags build-time invariants; the profile attributes the cost to the host[…] frame that ran the hash.'
   },
   {
     id: 'unbounded-vec',
@@ -218,7 +221,7 @@ let mut list = Vec::new(&env);
 for i in 0..user_count {
     list.push_back(i);
 }`,
-    tollcraftGuard: 'unbounded_input_loop lint alerts on missing guardrails; #[budget_memory_lt(N)] pins RAM ceiling in tests.'
+    tollcraftGuard: 'unbounded_input_loop lint alerts on missing guardrails; #[budget_mem_lt(N)] pins RAM ceiling in tests.'
   }
 ]
 

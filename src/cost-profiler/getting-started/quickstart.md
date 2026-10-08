@@ -1,24 +1,24 @@
 # Overview & Quickstart
 
-> Get started profiling your Soroban smart contracts to generate visual flamegraphs in minutes.
+> Run one exported function of a compiled Soroban contract under a traced engine and write its profile, in
+> about the time it takes to build the contract.
 
 ---
 
 ## Installation
 
-You can install `soroban-cost-profiler` using Cargo directly from the Tollcraft repository:
-
-```bash
-cargo install --git https://github.com/Tollcraft/soroban-cost-profiler
-```
-
-Or clone and build from source:
+Build the profiler from source:
 
 ```bash
 git clone https://github.com/Tollcraft/soroban-cost-profiler.git
 cd soroban-cost-profiler
-cargo build --release
+cargo build --release            # Rust 1.85 or newer; the crate is edition 2024
+./target/release/soroban-cost-profiler --help
 ```
+
+Building from source is the documented install path — the repository publishes no versioned release, so
+start from `--help` on the binary you built rather than a package name. The binary is not a cargo
+subcommand either: `cargo cost-profiler` does not exist. You run the binary and point it at a `.wasm` file.
 
 ---
 
@@ -54,47 +54,82 @@ Your unstripped binary containing DWARF line tables will be located at:
 
 ## 3. Run the Profiler
 
-Run `soroban-cost-profiler` against the compiled WASM binary, specifying the contract function you wish to trace:
+Point the binary at the compiled WASM and name the export to invoke:
 
 ```bash
 soroban-cost-profiler \
   --wasm target/wasm32-unknown-unknown/profiling/my_contract.wasm \
   --fn compute_heavy_loop \
-  --output flamegraph.svg
+  --output compute.folded
 ```
 
 The tool will:
-1. Load the WASM binary and parse DWARF line information.
-2. Spin up a metered Soroban execution environment.
-3. Trace every instruction and function call.
-4. Resolve instruction pointers to Rust file and line numbers.
-5. Aggregate inclusive and exclusive CPU costs.
-6. Render an interactive `flamegraph.svg`.
+
+1. Load and parse the module, then instantiate it against `soroban-env-host` — all 199 host functions are
+   linked, so an SDK contract actually runs.
+2. Record the engine's call, return, step and host-transition events, sampled every `--sample-rate`
+   boundaries (1000 by default).
+3. Name each frame from the binary's DWARF line tables, falling back to the wasm `name` section, then to
+   `wasm[pc]`.
+4. Fold the event stream into a call tree with exclusive and inclusive cost per frame.
+5. Write the artifact — collapsed stacks here, since `--format` defaults to `folded` — and print a ranked
+   summary of the same run on stdout.
+
+Read the artifact, not only the summary:
+
+```console
+$ soroban-cost-profiler --wasm target/wasm32-unknown-unknown/profiling/dwarf_probe.wasm --fn caller_of_heavy
+no function recorded any exclusive cost (cpu)
+$ cat profile.folded
+wasm[0] 0
+```
+
+That transcript is real, and the sentence is the tool doing its job: `wasmi` 2.0 hands the tracer call
+boundaries and no program counter, so frames arrive at `wasm[0]` and the cost columns read `0`. A profile
+of zeros and a profiler that never ran would otherwise look the same. When the export calls the host, the
+host frames carry the cost — measured on the repository's `dummy-contract` artifact, `memory_heavy_loop`
+at 100 iterations is 125,022 in CPU units, 50,080 in memory bytes, and 102 host calls.
+
+Read [Known Risks & Failure Modes](../reference/risks.md) before you treat any of these numbers as a
+budget estimate. For the instructions the network will actually charge, use Tier 2.
 
 ---
 
 ## 4. Inspect the Output
 
-Open `flamegraph.svg` in any standard web browser:
+There is no SVG to open: the profiler writes text and does not draw pictures. Three shapes, one flag:
+
+| `--format` | Writes | Default file | Reach for it when |
+| :--- | :--- | :--- | :--- |
+| `folded` (default) | one line per call path, `<frame>;<frame> <cost>` | `profile.folded` | you want to look at the run, or diff it later |
+| `json` | the call tree, metric and `file:line` on every frame | `profile.json` | a script or CI job walks the frames |
+| `raw` | one line per recorded event, unnamed and unfolded | `profile.raw` | the profile looks wrong and you want what the engine said |
 
 ```bash
-open flamegraph.svg
+# a picture, drawn by the tool that draws pictures
+flamegraph.pl compute.folded > compute.svg && open compute.svg
+
+# the same file in speedscope.app — it reads the collapsed-stack format directly
+open https://www.speedscope.app
+
+# the tree as data, straight into jq
+soroban-cost-profiler --wasm contract.wasm --fn compute_heavy_loop --format json --output - | jq .metric
 ```
 
-Alternatively, generate a `.folded` text file for interactive exploration in [Speedscope](https://www.speedscope.app):
+`--output -` sends the artifact to stdout and prints nothing else, which is what makes the last line work.
+With `--output` omitted, the filename follows the format — `profile.folded`, `profile.json`, `profile.raw`.
 
-```bash
-soroban-cost-profiler \
-  --wasm target/wasm32-unknown-unknown/profiling/my_contract.wasm \
-  --fn compute_heavy_loop \
-  --format speedscope \
-  --output profile.folded
-```
+In speedscope.app, switch views to read the same file three ways:
 
-Drag and drop `profile.folded` into [speedscope.app](https://www.speedscope.app) to switch between:
-* **Time Order view:** Visualizes the execution sequence over the transaction lifecycle.
-* **Left Heavy view:** Aggregates identical call stacks to immediately reveal top cost contributors.
-* **Sandwich view:** Shows callers and callees for any individual function.
+* **Sequence (Time Order) view:** the call paths as the trace recorded them.
+* **Left Heavy view:** stacks sorted by cost, so the widest frame is the biggest single contributor.
+* **Sandwich view:** one function with its callers above and its callees below.
+
+::: warning What the viewer is showing you
+The counts are boundaries the engine reported, not wasm instructions, and the tree is one level deep for a
+directly invoked export. A wide bar means "this frame had the most recorded cost", not "this line executed
+the most instructions". See [Reading & Visualizing Profiles](../guides/flamegraphs.md).
+:::
 
 ---
 

@@ -99,19 +99,20 @@ const stages: Stage[] = [
     headline: 'Eliminate structural cost anti-patterns before execution',
     description: 'Intercepts expensive patterns like storage mutations inside loops, redundant clone allocations, and unbounded recursion at build time with zero gas cost.',
     features: [
-      '40+ specialized Soroban AST and HIR lints',
+      '40 Soroban HIR lints, registered as rustc lint checks',
       'Detects blind storage writes and discarded reads',
       'Flags TTL extension in loops and inefficient byte concat',
-      'Configurable severity (deny, warn, allow) via cargo config'
+      'Severity is rustc\'s own: allow, warn, deny — set per lint with -A/-W/-D'
     ],
-    cliCommand: 'cargo cost-lint --all-targets',
-    cliOutput: `warning: storage write inside loop
+    cliCommand: 'cargo cost-lint',
+    cliOutput: `error: storage operations inside a loop
   --> contracts/pool/src/lib.rs:88:9
    |
 88 |   env.storage().instance().set(&key, &val);
    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   = help: batch storage operations outside the loop
-   = note: each write incurs 25k CPU instructions and ledger write fees`,
+   |
+   = note: [SOROBAN_STORAGE_IN_LOOP]
+   = help: each iteration pays a ledger write fee and grows the transaction footprint`,
     link: '/cost-linter/'
   },
   {
@@ -124,9 +125,9 @@ const stages: Stage[] = [
     description: 'Runs contract invocations through local metering or live Stellar RPC simulations. Pin resource ceilings and gate pull requests against regressions.',
     features: [
       'Tier A: Fast local test assertions via #[budget_cpu_lt(N)]',
-      'Tier B: Testnet simulation matching Stellar Protocol 22 fees',
+      'Tier B: Testnet simulation against the network the SDK targets (Protocol 27)',
       'Baseline snapshot tracking with --record-baseline and --check-baseline',
-      'Outputs automated GitHub Step Summaries, JSON, and CSV reports'
+      'Outputs automated GitHub Step Summaries, JSON, CSV and Markdown reports'
     ],
     cliCommand: 'cargo budget-report --check --network testnet',
     cliOutput: `=== BUDGET REGRESSION REPORT ===
@@ -142,23 +143,26 @@ Error: 1 budget check failed. Regression exceeds 10% tolerance.`,
     verb: 'DIAGNOSE',
     name: 'soroban-cost-profiler',
     phase: 'PHASE 03 • PROFILING TIME',
-    runtime: 'WASM interpreter & DWARF symbolizer',
-    headline: 'Pinpoint hot instructions and memory bottlenecks',
-    description: 'When budgets fail, step through contract WASM execution instruction-by-instruction. Correlate raw bytecode costs back to original Rust source code lines.',
+    runtime: 'wasmi 2.0 interpreter + gimli/DWARF symbolizer',
+    headline: 'Turn a failed budget into a named call tree',
+    description: 'When budgets fail, run one export under a traced engine, name its frames from the binary\'s own line tables, and write collapsed-stack text speedscope.app and flamegraph.pl can read.',
     features: [
-      'Interactive SVG Flamegraphs with zoom, search, and reset',
-      'Exclusive vs. inclusive cost attribution across subcalls',
-      'Speedscope folded stack export for deep frame analysis',
-      'Host function attribution for cryptographic and storage operations'
+      'Collapsed-stack, JSON and raw-trace output — text the standard profilers already read',
+      'Exclusive vs. inclusive cost attribution across the frames it sees',
+      'Host-call attribution: real soroban-env-host functions are linked, so host frames carry cost',
+      'compare diffs two .folded runs and prints the functions whose cost moved'
     ],
-    cliCommand: 'soroban-cost-profiler --wasm pool.wasm --fn swap -o profile.svg',
-    cliOutput: `[PROFILER] Symbolizing WASM via DWARF .debug_line...
-[PROFILER] Tracing 1,420,110 instructions across 14 stack frames...
-[PROFILER] Hotspots identified:
-  - 42.1% soroban_sdk::map::Map::insert (pool.rs:142)
-  - 28.4% host::crypto::sha256 (host call)
-  - 14.5% soroban_sdk::val_to_raw (serialization)
-[OUTPUT] Wrote interactive flamegraph -> profile.svg`,
+    cliCommand: 'soroban-cost-profiler --wasm dummy_contract.wasm --fn memory_heavy_loop',
+    cliOutput: `Top 1 functions by exclusive cost (cpu):
+  1. host[0]  125022
+
+$ soroban-cost-profiler … --metric memory
+Top 1 functions by exclusive cost (memory):
+  1. host[0]  50080
+
+$ soroban-cost-profiler … --metric hostcalls
+Top 1 functions by exclusive cost (hostcalls):
+  1. host[0]  102`,
     link: '/cost-profiler/'
   }
 ]

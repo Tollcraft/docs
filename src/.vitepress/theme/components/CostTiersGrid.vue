@@ -17,7 +17,7 @@
     <a class="tollcraft-card tier-3" :href="withBase('/cost-profiler/')">
       <div class="card-badge">Tier 3: Diagnose</div>
       <h3>Cost Profiler</h3>
-      <p>Visual flamegraphs and execution tracing. Diagnoses exactly which functions, loops, and host operations burned your budget.</p>
+      <p>Runs one contract export under a traced engine and names its frames from the binary's DWARF line tables, writing collapsed-stack text speedscope.app and flamegraph.pl read.</p>
       <div class="card-link">Explore Cost Profiler →</div>
     </a>
   </div>

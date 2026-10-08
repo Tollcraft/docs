@@ -6,9 +6,11 @@
 
 ## Why Speedscope?
 
-While static SVG flamegraphs are excellent for quick inspections, [Speedscope](https://www.speedscope.app) provides an interactive web-based interface designed specifically for performance analysis. It supports:
+While a static SVG is good for a quick look, [Speedscope](https://www.speedscope.app) gives an interactive
+browser UI over the same file — and speedscope.app is what the profiler's own documentation names as the
+first place a `.folded` artifact goes. It supports:
 
-* **Chronological view (Time Order):** Visualizes exactly what happened in execution order.
+* **Chronological view (Sequence):** Visualizes what the trace recorded, in order.
 * **Aggregated view (Left Heavy):** Merges common call paths to reveal bottlenecks.
 * **Sandwich view:** Shows all callers and callees of a specific function.
 
@@ -16,25 +18,29 @@ While static SVG flamegraphs are excellent for quick inspections, [Speedscope](h
 
 ## Exporting Folded Stacks
 
-`soroban-cost-profiler` can export folded stack format directly:
+The default format *is* the one speedscope reads, so the shortest command produces it:
 
 ```bash
 soroban-cost-profiler \
   --wasm target/wasm32-unknown-unknown/profiling/my_contract.wasm \
   --fn process_deposit \
-  --format speedscope \
   --output profile.folded
 ```
 
-The resulting file contains lines formatted as:
+`--format folded` is already the default; the other two values are `json` and `raw`. There is no
+`--format speedscope` and there is no `svg` format.
+
+The resulting file is the collapsed-stack format — a stack path, a space, the cost:
 
 ```text
-root;init_ledger;verify_caller 14500
-root;process_deposit;calculate_interest 280000
-root;process_deposit;update_balances;storage_set 1920000
+wasm[0];process_deposit 1508000
+wasm[0];process_deposit;calculate_interest 280000
+wasm[0];process_deposit;update_balances;host[0] 192000
 ```
 
-Where the final integer represents the number of metered CPU instructions consumed on that path.
+The trailing integer is the cost on that path **in whatever `--metric` the run used** (`cpu` by default, or
+`memory`, or `hostcalls`). A `.folded` file records no metric of its own, which is why both sides of a
+`compare` have to agree on the flag in advance.
 
 ---
 
@@ -48,10 +54,16 @@ Where the final integer represents the number of metered CPU instructions consum
 
 ## The Three Speedscope Views
 
-### 1. Time Order View
-In the Time Order view, the horizontal axis represents the progression of execution time (instruction order).
-* Use this to see the execution lifecycle: initialization $\to$ authorization checks $\to$ core math $\to$ state updates $\to$ event emission.
-* Quickly identify if a slow operation occurred early or late in the transaction.
+### 1. Sequence view
+In the Sequence view, the horizontal axis is the order the trace recorded.
+* Use it to see the execution lifecycle: initialization, authorization checks, core math, state updates,
+  event emission.
+* Quickly identify whether a slow operation happened early or late in the transaction.
+
+::: info This view has little to show today
+Only the host-initiated call is recorded as a boundary, so a directly invoked export traces one frame.
+Sequence and Left Heavy differ mainly when host transitions are in the run.
+:::
 
 ### 2. Left Heavy View
 In the Left Heavy view, all identical call stacks are grouped and sorted with the heaviest consumers on the left.

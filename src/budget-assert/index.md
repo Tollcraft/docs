@@ -7,7 +7,7 @@
 Part of the **Tollcraft** initiative:
 * **Tier 1: Prevent** — [Cost Linter](/cost-linter/): Catch structurally expensive anti-patterns before compilation.
 * **Tier 2: Detect** — [Budget Assert](index.md): Measure network-simulated costs and enforce budgets in CI.
-* **Tier 3: Diagnose** — [Cost Profiler](/cost-profiler/): Trace execution and generate visual flamegraphs down to Rust lines.
+* **Tier 3: Diagnose** — [Cost Profiler](/cost-profiler/): Run one contract export under a traced engine and name its frames from the binary's DWARF line tables.
 
 ---
 
@@ -15,7 +15,11 @@ Part of the **Tollcraft** initiative:
 
 `soroban-budget-assert` solves a critical failure mode in Soroban smart contract engineering: **local resource estimates do not match real network costs**, and the error can point in either direction.
 
-Measured on an example contract (`do_expensive_work(10_000)`):
+Measured on an example contract (`do_expensive_work(10_000)`), and recorded with its build context in
+[`MEASUREMENTS.md`](https://github.com/Tollcraft/soroban-budget-assert/blob/main/MEASUREMENTS.md)
+(local estimate from `Env::cost_estimate()`, network figure from `simulateTransaction`, rustc 1.81,
+2025-Q1; a third build of the same function on the default `release` profile measures 767,049 against
+832,006 — **−7.8%**, the gap pointing the other way):
 
 <div class="divergence-box">
   <div class="divergence-title">
@@ -35,7 +39,7 @@ Measured on an example contract (`do_expensive_work(10_000)`):
     <div class="divergence-item">
       <div class="divergence-label">TESTNET GROUND TRUTH</div>
       <div class="divergence-val truth">756,678</div>
-      <div class="divergence-note">Exact Protocol 22 Network Simulation</div>
+      <div class="divergence-note">Network truth from `simulateTransaction` on Soroban testnet</div>
     </div>
   </div>
 </div>

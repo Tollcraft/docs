@@ -50,16 +50,16 @@ const commands: TerminalCommand[] = [
     id: 'lint',
     badge: 'T1',
     label: 'cargo cost-lint',
-    command: 'cargo cost-lint --all-targets',
+    command: 'cargo cost-lint',
     formattedOutput: `<span class="c-dim">Building member crates for cost audit...</span>
-<span class="c-yellow">warning</span><span class="c-bold">: storage_in_loop detected</span>
+<span class="c-red">error</span><span class="c-bold">: storage operations inside a loop</span>
   <span class="c-cyan">--&gt;</span> contracts/amm-pool/src/lib.rs:94:13
    <span class="c-cyan">|</span>
 <span class="c-cyan">94</span> <span class="c-cyan">|</span>     env.storage().instance().set(&key, &user_deposit);
    <span class="c-cyan">|</span>     <span class="c-yellow">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
+   <span class="c-cyan">=</span> <span class="c-bold">note</span>: [SOROBAN_STORAGE_IN_LOOP] is the driver's one Deny-level lint
    <span class="c-cyan">=</span> <span class="c-bold">help</span>: batch storage writes outside the loop iteration
-   <span class="c-cyan">=</span> <span class="c-bold">cost impact</span>: ~25,000 CPU instructions + 1 ledger write entry per cycle
-<span class="c-green">[OK]</span> Finished analysis in 0.42s (1 warning, 0 errors)`
+<span class="c-green">[OK]</span> Finished analysis in 0.42s (1 warning, 1 error)`
   },
   {
     id: 'assert',
@@ -69,31 +69,26 @@ const commands: TerminalCommand[] = [
     formattedOutput: `<span class="c-dim">Deploying WASM to Stellar Testnet (RPC: https://soroban-testnet.stellar.org)...</span>
 <span class="c-dim">Simulating invocations via SorobanTransactionData XDR...</span>
 
-<span class="c-bold">=== WORKSPACE BUDGET REGRESSION REPORT ===</span>
-<span class="c-cyan">amm-pool::deposit</span>
-  • CPU Instructions :  <span class="c-green">892,104</span> / 1,000,000 inst.  <span class="c-green">[PASS]</span>
-  • Memory Bytes     :   <span class="c-green">14,280</span> /    25,000 B      <span class="c-green">[PASS]</span>
-  • Read Bytes       :    <span class="c-green">1,024</span> /     2,000 B      <span class="c-green">[PASS]</span>
-  • Write Bytes      :      <span class="c-green">512</span> /     1,000 B      <span class="c-green">[PASS]</span>
-<span class="c-green">[PASS] All 4 budget limits satisfied within 0% tolerance. CI check passed.</span>`
+<span class="c-bold">=== BUDGET CHECKS ===</span>
+amm-pool-contract::do_expensive_work [<span class="c-cyan">CPU Instructions</span>] value=<span class="c-green">1,234,567</span> inst. limit=5,000,000 inst. <span class="c-green">PASS</span>
+amm-pool-contract::do_expensive_work [<span class="c-cyan">Read Bytes</span>] value=<span class="c-green">2,048</span> B limit=5,000 B <span class="c-green">PASS</span>
+amm-pool-contract::do_expensive_work [<span class="c-cyan">Write Bytes</span>] value=<span class="c-red">4,096</span> B limit=1,000 B <span class="c-red">FAIL</span>
+<span class="c-bold">Summary: 2 check(s) passed, 1 failed</span>`
   },
   {
     id: 'profiler',
     badge: 'T3',
     label: 'soroban-cost-profiler',
-    command: 'soroban-cost-profiler --wasm pool.wasm --fn swap --output flamegraph.svg',
-    formattedOutput: `<span class="c-dim">Loading WASM binary (target/wasm32-unknown-unknown/profiling/pool.wasm)...</span>
-<span class="c-dim">Parsed 2,418 DWARF debug line entries.</span>
-<span class="c-magenta">Tracing execution of function: swap()</span>
-Execution completed in 1,248,310 instructions.
+    command: 'soroban-cost-profiler --wasm dummy_contract.wasm --fn memory_heavy_loop --args 429496729604',
+    formattedOutput: `<span class="c-bold">Top 1 functions by exclusive cost (cpu):</span>
+  1. <span class="c-magenta">host[0]</span>  <span class="c-yellow">125022</span>
 
-<span class="c-bold">Top Hotspots by Exclusive Instruction Count:</span>
-  1. <span class="c-magenta">41.8%</span>  521,800 inst.  soroban_sdk::map::Map::insert (pool.rs:148)
-  2. <span class="c-cyan">28.2%</span>  352,000 inst.  host::crypto::sha256_slice (host call)
-  3. <span class="c-yellow">16.4%</span>  204,720 inst.  amm_math::compute_constant_product (math.rs:32)
-  4. <span class="c-dim">13.6%</span>  169,790 inst.  other frame calls
+<span class="c-dim">→ profile.folded</span>
+<span class="c-cyan">wasm[0]</span> 0
+<span class="c-cyan">wasm[0];host[0]</span> <span class="c-yellow">125022</span>
 
-<span class="c-green">[OK] Interactive SVG flamegraph exported to ./flamegraph.svg</span>`
+<span class="c-dim">--metric hostcalls on the same run: host[0] 102</span>
+<span class="c-dim">= vec_new + 100 × vec_push_back + vec_len</span>`
   }
 ]
 
@@ -254,6 +249,7 @@ function copyCommand() {
 :deep(.c-magenta) { color: #e879f9; }
 :deep(.c-yellow) { color: #fbbf24; }
 :deep(.c-green) { color: #34d399; }
+:deep(.c-red) { color: #f87171; }
 :deep(.c-dim) { color: #6f6790; }
 :deep(.c-bold) { font-weight: 700; color: #ffffff; }
 </style>

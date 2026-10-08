@@ -7,7 +7,7 @@
 Part of the **Tollcraft** initiative:
 * **Tier 1: Prevent** — [Cost Linter](index.md): Catch structurally expensive anti-patterns before compilation.
 * **Tier 2: Detect** — [Budget Assert](/budget-assert/): Measure network-simulated costs and enforce budgets in CI.
-* **Tier 3: Diagnose** — [Cost Profiler](/cost-profiler/): Trace execution and generate visual flamegraphs down to Rust lines.
+* **Tier 3: Diagnose** — [Cost Profiler](/cost-profiler/): Run one contract export under a traced engine and name its frames from the binary's DWARF line tables.
 
 ---
 
@@ -34,8 +34,8 @@ Cost bugs don't fail standard tests — they silently inflate transaction fees i
 Our linter hooks directly into the Rust compiler's High-Level Intermediate Representation (HIR) via [Dylint](https://github.com/trailofbits/dylint) to detect input-independent, structurally expensive patterns — alerting you before they are compiled and deployed to the network.
 
 ```bash
-# Run lint checks across all contract crates in the workspace
-cargo cost-lint --all-targets
+# Run lint checks across every crate in the workspace
+cargo cost-lint --workspace
 ```
 
 ---

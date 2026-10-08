@@ -2,12 +2,15 @@
 
 <span class="tier-pill t3">Tier 3 • Diagnose</span>
 
-> **Visual flamegraphs and execution tracing for Soroban smart contracts** — pinpoint the exact functions, loops, and host operations consuming your transaction budget.
+> **Execution tracing and cost attribution for Soroban smart contracts** — turn a failed budget into a
+> profile that names the functions and source lines where the cost was recorded.
 
 Part of the **Tollcraft** initiative.
 
-::: tip Interactive Online Playground Available
-Don't want to install anything locally yet? Try out the [**Interactive Web Playground**](https://tollcraft.github.io/soroban-cost-profiler/) to inspect live sample flamegraphs, zoom into stack frames, and search hot functions right in your browser.
+::: tip Product tour available
+The [**demo page**](https://tollcraft.github.io/soroban-cost-profiler/) walks the pipeline and shows the
+real command line and output, including what a degraded run prints. It is a tour of the tool, not a
+profiler running in your browser.
 :::
 
 ---
@@ -33,7 +36,8 @@ When your contract transaction executes, the Stellar network calculates a non-re
 
 ## The Visibility Problem
 
-Testing tools like `soroban-budget-assert` can tell you *that* an invocation consumed 8,450,000 CPU instructions and violated your CI budget. However, raw numbers do not tell you *why*:
+Testing tools like `soroban-budget-assert` can tell you *that* an invocation burned through your CI
+budget. However, raw numbers do not tell you *why*:
 
 * Was the budget spike caused by an unrolled loop in your contract logic?
 * Did an innocently structured helper method repeatedly cross the WASM-to-host boundary?
@@ -41,7 +45,18 @@ Testing tools like `soroban-budget-assert` can tell you *that* an invocation con
 
 Without execution profiling, developers are forced to manually comment out code blocks or insert ad-hoc logging to guess where instructions were burned.
 
-`soroban-cost-profiler` solves this by tracing WebAssembly (WASM) execution instruction-by-instruction, resolving instruction pointers back to human-readable Rust source code lines via DWARF symbols, and rendering visual flamegraphs.
+`soroban-cost-profiler` solves this by running one exported function of a compiled contract under an
+instrumented engine, rebuilding the call tree from what the engine reports, naming the frames from the
+binary's own DWARF line tables, and writing the result as collapsed-stack text, JSON, or the raw event
+stream.
+
+::: warning Read the limitations before you read a number
+The pipeline is complete and tested — load, trace, symbolize, aggregate, format, diff — and its ceiling is
+at the *input*: `wasmi` 2.0 exposes no instruction-level hook and its call hook carries no program counter,
+so the tracer sees a list of call boundaries rather than the instructions between them, and today every
+frame lands at `wasm[0]`. The counts are a floor and a shape, not a budget reading. See
+[Known Risks & Failure Modes](reference/risks.md).
+:::
 
 ---
 
@@ -60,15 +75,22 @@ Without execution profiling, developers are forced to manually comment out code 
                                                              │
                                                              ▼
 ┌──────────────────┐     ┌───────────────────┐     ┌────────────────────┐
-│ Visual Output    │ <── │ Output Formatter  │ <── │   Source Mapper    │
-│ (Flamegraph/SVG) │     │ (Folded Stacks)   │     │   (gimli/DWARF)    │
+│ Text Artifact    │ <── │ Output Formatter  │ <── │   Source Mapper    │
+│ .folded/.json/   │     │ (folded stacks,   │     │   (gimli/DWARF)    │
+│ .raw  + summary  │     │  JSON tree, raw)  │     │                    │
 └──────────────────┘     └───────────────────┘     └────────────────────┘
 ```
 
-1. **WASM Instrumentation:** Hooks into the execution engine to monitor function calls, returns, and metered instruction steps.
-2. **DWARF Source Resolution:** Translates raw WASM Program Counters (PC) into Rust function names, source files, and line numbers.
-3. **Cost Aggregation:** Calculates both **exclusive** (self-consumed) and **inclusive** (total sub-tree) CPU instructions and memory consumption for every frame.
-4. **Visual Flamegraph Generation:** Exports standard folded-stack profiles compatible with tools like `speedscope.app` or renders interactive SVGs via `inferno`.
+1. **WASM tracing:** Hooks into the execution engine to record call and return boundaries, host
+   transitions, and sampled steps with their cost deltas.
+2. **DWARF source resolution:** Translates a code-section address into a Rust function name, source
+   file, and line number when the binary's line tables carry it; falls back to the wasm `name`
+   section, then to `wasm[pc]`.
+3. **Cost aggregation:** Calculates both **exclusive** (self-consumed) and **inclusive** (total
+   sub-tree) CPU instructions, memory bytes, and host calls for every frame.
+4. **Text output:** Writes the standard collapsed-stack format that speedscope.app opens directly and
+   `flamegraph.pl` turns into a picture, plus a JSON call tree and the raw event stream, and prints a
+   terminal summary of the same run. The tool writes text and no SVG.
 
 ---
 
@@ -94,7 +116,9 @@ Ready to start profiling? Read the [**Overview & Quickstart**](getting-started/q
 * [**The Debug Precondition**](getting-started/debug_precondition.md) — How to preserve DWARF symbols without bloating production mainnet contracts
 * [**Soroban Cost Model & Metering**](cost/cost_model.md) — Detailed breakdown of Soroban cost types, host dispatch, and fee calculations
 * [**Exclusive vs. Inclusive Costs**](cost/exclusive_vs_inclusive.md) — How to interpret self-cost versus child-call costs
-* [**Generating & Reading Flamegraphs**](guides/flamegraphs.md) — How to read and navigate collapsed stacks and flamegraphs
-* [**CLI Tool Reference**](reference/cli.md) — Flags, options, and commands
-* [**Development Roadmap**](contributing/roadmap.md) — Current status and upcoming milestones
+* [**Reading & Visualizing Profiles**](guides/flamegraphs.md) — The collapsed-stack format, speedscope.app, and `flamegraph.pl`
+* [**Diagnosing Regressions**](guides/diagnosing_regressions.md) — `compare` two runs and read the table
+* [**CLI Tool Reference**](reference/cli.md) — Flags, output formats, subcommands, and exit codes
+* [**Known Risks & Failure Modes**](reference/risks.md) — What the trace cannot see, and what a profile of zeros means
+* [**Development Roadmap**](contributing/roadmap.md) — What has shipped and what is left
 

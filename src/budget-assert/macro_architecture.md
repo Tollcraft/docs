@@ -76,10 +76,12 @@ soroban-budget-assert/
 │       └── ui/support/      # mock_env.rs for UI tests
 ├── amm-pool-contract/       # Integration tests that exercise macros against real Env
 ├── cargo-budget-report/     # CLI — no dependency on budget-macros
-└── docs/src/                # GitBook documentation
+└── docs/src/                # The repository's own GitBook-era docs copy; the live site is Tollcraft/docs
 ```
 
-`budget-macros` is an independent crate with no runtime dependency on the Soroban SDK. Its only production dependencies are `syn`, `quote`, `proc-macro2`, and `serde_json` (for compile-time `config = "key"` resolution). The generated code references `env.cost_estimate().budget()` by identifier, so the test function must have a binding named `env` of a type that exposes that path — typically `soroban_sdk::Env`.
+`budget-macros` is an independent crate with no runtime dependency on the Soroban SDK. Its only dependencies are `syn` (with `full`, `extra-traits` and `visit-mut`), `quote`, and `proc-macro2` — there is no JSON or TOML parser in the crate, because limit resolution happens in the **generated** code, which calls `std::env::var` and `std::fs::read_to_string` at test runtime. That is why the crate is marked test-only in its own `Cargo.toml`: it is a dev-dependency of `amm-pool-contract` and used exclusively under `#[cfg(test)]`, and generated code referencing `std` would not compile into a production contract.
+
+The generated code references `env.cost_estimate().budget()` by identifier, so the test function must have a binding named `env` of a type that exposes that path — typically `soroban_sdk::Env`.
 
 ## Expansion Flow
 
