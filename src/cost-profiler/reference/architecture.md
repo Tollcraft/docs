@@ -31,7 +31,7 @@
                                     │
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 2. SOURCE MAPPER (src/source_map.rs + dwarf.rs / names.rs / wasm.rs)   │
+│ 2. SOURCE MAPPER (src/source_map/mod.rs + its dwarf/names/wasm.rs)     │
 │    • Walks the binary's custom sections for DWARF, name, and code maps │
 │    • Translates a code-section address into a SourceFrame              │
 │    • Falls back to the WASM name section, then to an unmapped mapper   │
@@ -81,7 +81,7 @@ Two modules exist so that a real contract can be run at all, and neither is a st
 * `wasmi` 2.0 gives its call hook no instruction pointer, so **every event the tracer records carries `pc = 0`**. That is a real address belonging to no instruction, and it is why a default run's frames read `wasm[0]`.
 * WASM-side cost is currently **one synthetic unit per boundary**, not a metered instruction count. Host cost is the accurate half of a trace because it is measured from the budget. This is why a profile's counts are counts of boundaries and host budget, and why a whole run can collapse into a single frame.
 
-### 2. Source Mapper (`src/source_map.rs`, `source_map/dwarf.rs`, `source_map/names.rs`, `source_map/wasm.rs`)
+### 2. Source Mapper (`src/source_map/mod.rs`, `source_map/dwarf.rs`, `source_map/names.rs`, `source_map/wasm.rs`)
 Stage 2 is the only place a program counter is translated into a name. `SourceMapper` holds one of three things:
 
 * an `addr2line::Context` built from the DWARF custom sections of the binary that was loaded,

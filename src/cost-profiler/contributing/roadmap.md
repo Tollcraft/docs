@@ -15,11 +15,13 @@
 | **Phase 3** | DWARF Source Mapping | **Complete** ✅ | 16 / 16 |
 | **Phase 4** | Aggregation & Formatting | **Complete** ✅ | 5 / 5 |
 | **Phase 5** | CLI & Edge Cases (MVP completion) | **Complete** ✅ | 26 / 26 |
-| **Phase 6** | Code Quality & Refactoring | **In Progress** 🚧 | 19 / 20 |
+| **Phase 6** | Code Quality & Refactoring | **Complete** ✅ | 20 / 20 |
 | — | Metering Probes (`tests/meter_probe.rs`) | **Complete** ✅ | 3 / 3 |
 | — | Website Polish (landing page audit) | **Complete** ✅ | 7 / 7 |
 
-Counts are checkbox states in `ROADMAP.md` as of 2026-10-08. The one open box is #220, below.
+Counts are checkbox states in `ROADMAP.md` as of 2026-10-08, read from that file on `main`. #220 was the
+last unchecked box in the repository, so **no box is open**: 109 checked across the six phases and the
+three side tracks (tooling, metering probes, website polish), 0 unchecked.
 
 ---
 
@@ -47,18 +49,28 @@ them) so a real SDK contract runs; standardized exit codes; trap-time trace flus
 binary without line tables; `compare`; the end-to-end CLI tests; and the README's Limitations section.
 
 **Phase 6 — Quality.** The per-file documentation and test bank (#45-#64), the Apache-2.0 `LICENSE`, the
-Code of Conduct, the PR template, and the `src/source_map` refactor series.
+Code of Conduct, the PR template, and the `src/source_map` refactor series (#217-#220), which turned a
+single 2,431-line file into `source_map/`: `wasm.rs` (`WasmSections`, the container walk), `names.rs`
+(`NameSection`, the fallback), `dwarf.rs` (`CodeMap` and the `gimli` traversal), and `mod.rs` holding
+only the facade — construction, the DWARF-then-`name` precedence, the resolution cache, and the
+degenerate-line-tables threshold — with the public path unchanged. No `gimli` or `addr2line` type is
+named in `mod.rs`, which is what makes the "no custom DWARF parsing" rule checkable one file at a time.
 
 ---
 
 ## Open work
 
-- [ ] **Thin out the `SourceMapper` facade (#220):** move `src/source_map.rs` to
-  `src/source_map/mod.rs` so the facade holds only the public surface, the resolution cache and the
-  degenerate-DWARF policy, and the measurement that feeds that policy stays with the code that walks the
-  line tables in `source_map/dwarf.rs`. #217-#219 landed the three submodules this finishes — `wasm.rs`
-  (`WasmSections`), `names.rs` (`NameSection`), `dwarf.rs` (`CodeMap`) — by extracting them out of a single
-  2,431-line file.
+**Nothing in the plan.** Every box in `ROADMAP.md` is checked as of 2026-10-08, and issue #220 — the facade
+split described above — was the last open issue in the repository. Work now starts from a new issue, not
+from this page.
+
+Two things the roadmap deliberately does **not** claim to have solved:
+
+* **Instruction-level tracing is an upstream gap.** See the findings below: `wasmi` 2.0 exposes no
+  instruction hook, and no box in this repository owns that.
+* **The generated quality bank is not a to-do list.** Several of its targets have nothing to optimize, which
+  `ROADMAP.md` records as blocked or not applicable rather than closing them with a cosmetic diff — see
+  [Issues triaged rather than implemented](#issues-triaged-rather-than-implemented).
 
 ---
 

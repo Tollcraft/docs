@@ -59,8 +59,8 @@ soroban-cost-profiler/
 │   ├── tracer.rs                 # ExecutionTracer: the wasmi call/return/step hooks
 │   ├── host.rs                   # the 199 soroban-env-host function bindings
 │   ├── state.rs                  # --state: ledger snapshot → Host
-│   ├── source_map.rs             # SourceMapper facade: name lookup + the policies
-│   ├── source_map/               # its submodules
+│   ├── source_map/               # Stage 2: an address in, a name out, plus the policies
+│   │   ├── mod.rs                # SourceMapper facade: resolution, cache, degenerate threshold
 │   │   ├── wasm.rs               # WasmSections: parse the wasm module
 │   │   ├── names.rs              # NameSection: the function-name fallback
 │   │   └── dwarf.rs              # CodeMap: gimli line tables + the degenerate sample
