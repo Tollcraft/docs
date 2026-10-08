@@ -16,12 +16,17 @@
 | **Phase 4** | Aggregation & Formatting | **Complete** ✅ | 5 / 5 |
 | **Phase 5** | CLI & Edge Cases (MVP completion) | **Complete** ✅ | 26 / 26 |
 | **Phase 6** | Code Quality & Refactoring | **Complete** ✅ | 20 / 20 |
+| — | Tooling & Agent Setup | **Complete** ✅ | 4 / 4 |
 | — | Metering Probes (`tests/meter_probe.rs`) | **Complete** ✅ | 3 / 3 |
 | — | Website Polish (landing page audit) | **Complete** ✅ | 7 / 7 |
+| — | Documentation Upkeep (post-MVP) | **Complete** ✅ | 2 / 2 |
 
 Counts are checkbox states in `ROADMAP.md` as of 2026-10-08, read from that file on `main`. #220 was the
-last unchecked box in the repository, so **no box is open**: 109 checked across the six phases and the
-three side tracks (tooling, metering probes, website polish), 0 unchecked.
+last unchecked box the original plan held, so **no box is open**: 111 checked across the six phases and the
+four side tracks (tooling, metering probes, website polish, documentation upkeep), 0 unchecked. One caveat
+about that figure, because the page prints it: the file lists the #163 fallback-documentation entry twice,
+so 111 checked lines describe 110 pieces of work. Nothing depends on the number — it is here so a reader who
+counts gets the same answer twice.
 
 ---
 
@@ -55,6 +60,15 @@ single 2,431-line file into `source_map/`: `wasm.rs` (`WasmSections`, the contai
 only the facade — construction, the DWARF-then-`name` precedence, the resolution cache, and the
 degenerate-line-tables threshold — with the public path unchanged. No `gimli` or `addr2line` type is
 named in `mod.rs`, which is what makes the "no custom DWARF parsing" rule checkable one file at a time.
+
+**Documentation upkeep (post-MVP).** A track outside the six phases, opened when the README's Contributors
+grid turned out to be a **dated snapshot with no way to refresh it**: the person landing someone's sixteenth
+contribution now regenerates the grid with one documented command, in the same PR, instead of hand-adding a
+tile. `ROADMAP.md` carries the two entries (#249 added the rule in
+[`CONTRIBUTING.md`](https://github.com/Tollcraft/soroban-cost-profiler/blob/main/CONTRIBUTING.md#keeping-the-contributor-grid-current),
+#251 corrected the figure it quoted into an invariant, because the merge that carried it invalidated the
+number on contact). The command itself lives in that section rather than being copied here — two copies of it
+is two things to keep in sync, which is the failure the section exists to prevent.
 
 ---
 

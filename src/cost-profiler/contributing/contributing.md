@@ -40,6 +40,12 @@ We welcome contributions across all areas of the `soroban-cost-profiler` project
    even for users with admin — the pull request is the only way in, from a fork or a branch. Include context
    explaining the problem, the solution, and the verification you actually ran, and land the `ROADMAP.md`
    box for the issue in the same branch.
+6. **If the PR lands someone's first contribution:** add them to `README.md`'s Contributors grid **in that
+   same PR**, by running the command in
+   [`CONTRIBUTING.md` → "Keeping the contributor grid current"](https://github.com/Tollcraft/soroban-cost-profiler/blob/main/CONTRIBUTING.md#keeping-the-contributor-grid-current)
+   and pasting its output. The grid is a dated snapshot, not a badge, so it only stays true if the PR that
+   makes someone a contributor also re-reads the list — and a hand-added tile is a claim with no command
+   behind it.
 
 ---
 
