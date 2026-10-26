@@ -166,7 +166,8 @@ export default defineConfig({
       ]
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Tollcraft' }
+      { icon: 'github', link: 'https://github.com/Tollcraft' },
+      { icon: 'x', link: 'https://x.com/tollcraft_dev' }
     ],
     footer: {
       message: 'Built for the Stellar & Soroban ecosystem.',
