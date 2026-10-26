@@ -40,3 +40,8 @@ npm run docs:preview
 ## Deployment
 
 The documentation site is automatically built and deployed to GitHub Pages on push to `main` via `.github/workflows/deploy.yml`.
+
+## Community
+
+[GitHub](https://github.com/Tollcraft) · [Discord](https://discord.gg/5aprtMSyR) ·
+[Telegram](https://t.me/+Gflo5jZStw1jMjE0) · [X](https://x.com/tollcraft_dev)
